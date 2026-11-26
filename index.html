@@ -144,6 +144,14 @@
       background-color: rgba(150, 114, 73, 0.12);
     }
 
+    #profile-overlay {
+      transition: opacity 0.35s ease;
+    }
+
+    #profile-panel {
+      transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s ease;
+    }
+
     ::-webkit-scrollbar {
       width: 5px;
       height: 5px;
@@ -440,8 +448,8 @@
       <div class="text-center mb-8 sm:mb-10">
         <p class="text-[10px] sm:text-xs tracking-[0.4em] text-gold/75 uppercase mb-1.5">RELATIONSHIP MAP</p>
         <h2 class="text-xl sm:text-2xl font-semibold tracking-[0.3em] pl-[0.3em] text-gold">人物關關係圖</h2>
-        <p class="text-[11px] sm:text-xs tracking-[0.18em] text-[#9A9287] mt-2">
-          點擊氣泡節點或下方頭像切換焦點人物
+        <p class="text-[11px] sm:text-xs tracking-[0.16em] text-[#9A9287] mt-2">
+          點擊氣泡切換焦點人物；點選已建檔角色下方的「檔案」按鈕開啟個人檔案頁
         </p>
       </div>
 
@@ -453,7 +461,7 @@
 
         <div
           id="relation-stage"
-          class="relative w-full h-[440px] sm:h-[500px] rounded bg-ink/80 border border-gold/15 overflow-hidden mb-7 select-none"
+          class="relative w-full h-[450px] sm:h-[510px] rounded bg-ink/80 border border-gold/15 overflow-hidden mb-7 select-none"
         >
           <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
             <div class="w-48 h-48 sm:w-64 sm:h-64 rounded-full border border-gold/10"></div>
@@ -485,6 +493,95 @@
       </div>
     </section>
 
+  </div>
+
+  <!-- =========================================================================
+       第三層：覆蓋式角色個人檔案頁 (#profile-overlay)
+       ========================================================================= -->
+  <div
+    id="profile-overlay"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="profile-name"
+    class="hidden fixed inset-0 z-[80] bg-ink/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 md:p-8 opacity-0"
+  >
+    <div
+      id="profile-panel"
+      class="relative w-full max-w-5xl max-h-[90dvh] overflow-y-auto washi-bg border border-gold/50 rounded shadow-[0_24px_80px_rgba(0,0,0,0.85)] translate-y-4 opacity-0"
+    >
+      <div class="sticky top-0 z-20 flex items-center justify-between px-5 py-3.5 sm:px-7 sm:py-4 bg-ink/95 backdrop-blur-md border-b border-gold/25">
+        <div class="flex items-center gap-2.5">
+          <span class="w-2 h-2 rotate-45 border border-gold"></span>
+          <span class="text-[11px] sm:text-xs tracking-[0.32em] text-gold/85 uppercase">CHARACTER DOSSIER</span>
+        </div>
+
+        <button
+          id="close-profile-btn"
+          type="button"
+          class="px-3.5 py-1 text-xs tracking-[0.22em] text-gold border border-gold/45 rounded hover:bg-gold/15 hover:border-gold transition-all cursor-pointer"
+        >
+          關閉檔案
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-12 min-h-[540px]">
+
+        <div class="md:col-span-5 border-b md:border-b-0 md:border-r border-gold/25 p-5 sm:p-7 flex flex-col">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-[10px] tracking-[0.3em] text-gold/75">全身立繪</span>
+            <span class="text-[10px] tracking-[0.2em] text-[#8E877D]">FULL BODY</span>
+          </div>
+
+          <div
+            id="profile-fullbody-slot"
+            class="flex-1 min-h-[320px] sm:min-h-[440px] rounded bg-ink/85 border border-gold/30 flex flex-col items-center justify-center p-3 text-center relative overflow-hidden"
+          ></div>
+        </div>
+
+        <div class="md:col-span-7 p-5 sm:p-7 md:p-8 flex flex-col justify-between gap-6">
+
+          <div class="border-b border-gold/25 pb-5 sm:pb-6">
+            <div class="flex flex-wrap items-center gap-2.5 mb-2">
+              <span
+                id="profile-role"
+                class="px-2.5 py-0.5 text-[10px] sm:text-xs tracking-[0.2em] text-gold bg-gold/10 border border-gold/35 rounded-sm"
+              ></span>
+              <span class="text-[11px] tracking-[0.22em] text-[#8E877D]">八幡組档案</span>
+            </div>
+
+            <h2
+              id="profile-name"
+              class="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-[0.28em] text-[#F5F1E8] mb-4"
+            ></h2>
+
+            <div class="grid grid-cols-2 gap-3 sm:gap-4 max-w-md">
+              <div class="px-3.5 py-2.5 rounded bg-ink/80 border border-gold/25">
+                <span class="block text-[10px] tracking-[0.25em] text-gold/75 mb-1">年齡</span>
+                <span id="profile-age" class="text-sm sm:text-base tracking-[0.15em] text-[#EDE8DF] font-medium"></span>
+              </div>
+
+              <div class="px-3.5 py-2.5 rounded bg-ink/80 border border-gold/25">
+                <span class="block text-[10px] tracking-[0.25em] text-gold/75 mb-1">身高</span>
+                <span id="profile-height" class="text-sm sm:text-base tracking-[0.15em] text-[#EDE8DF] font-medium"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex-1 flex flex-col">
+            <div class="flex items-center justify-between mb-2.5">
+              <h3 class="text-xs sm:text-sm tracking-[0.28em] text-gold font-medium">角色完整介紹</h3>
+              <span class="text-[10px] tracking-[0.2em] text-[#8E877D]">PROFILE NOTES</span>
+            </div>
+
+            <div
+              id="profile-bio"
+              class="flex-1 min-h-[190px] sm:min-h-[220px] rounded bg-ink/75 border border-gold/25 p-4 sm:p-5 text-xs sm:text-sm leading-[1.95] tracking-[0.12em] text-[#DFD8CD] whitespace-pre-line"
+            ></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- 1. 障子門自動開啟與保底 -->
@@ -671,7 +768,19 @@
       });
 
       var characters = [
-        { id: 'nagi', name: '八幡 凪', shortName: '凪', role: '少當家候補', avatarUrl: './eighthead01.png', isPreCircled: true },
+        {
+          id: 'nagi',
+          name: '八幡 凪',
+          shortName: '凪',
+          role: '少當家候補',
+          avatarUrl: './eighthead01.png',
+          isPreCircled: true,
+          hasProfile: true,
+          age: '23歲',
+          height: '154公分',
+          fullBodyUrl: './eighthead0101.png',
+          bio: '關東極道八幡組組長八幡龍司的外孫女，總是臭著一張臉，看起來有些難以接近的樣子。似乎不太擅長表達情緒，對極道中人嚴肅且冷硬，但對非極道人士倒是溫柔卻疏離。在8歲時回到八幡組本家由外祖父龍司扶養，回到本家之後被組裡的這些叔叔哥哥當做妹妹、女兒甚至孫女一樣照顧。\n\n因為龍司主導她的婚事，為了掌握主動權而加入了少當家的競爭。目前最主要的對手是同組的嶽釜久遠，跟對方相當合不來。\n\n從小就擅長打架，也制霸了周圍的學校小混混成為隱藏的共主，雖然善於動手但似乎有天生的領袖魅力，匯聚了各式各樣的人在她身邊。'
+        },
         { id: 'kazuki', name: '小泉 一樹', shortName: '一樹', role: '一般組員', avatarUrl: '', isPreCircled: false },
         { id: 'kana', name: '穎川 歌那', shortName: '歌那', role: '外部勢力', avatarUrl: '', isPreCircled: false },
         { id: 'gen', name: '宇佐 玄', shortName: '玄', role: '外部勢力', avatarUrl: '', isPreCircled: false },
@@ -696,6 +805,98 @@
       var linesSvg = document.getElementById('relation-lines-svg');
       var nodesLayer = document.getElementById('relation-nodes-layer');
       var avatarLinksContainer = document.getElementById('characterAvatarLinks');
+
+      var profileOverlay = document.getElementById('profile-overlay');
+      var profilePanel = document.getElementById('profile-panel');
+      var closeProfileBtn = document.getElementById('close-profile-btn');
+      var profileRoleEl = document.getElementById('profile-role');
+      var profileNameEl = document.getElementById('profile-name');
+      var profileAgeEl = document.getElementById('profile-age');
+      var profileHeightEl = document.getElementById('profile-height');
+      var profileBioEl = document.getElementById('profile-bio');
+      var profileFullbodySlot = document.getElementById('profile-fullbody-slot');
+
+      function renderFullbodyPlaceholder() {
+        if (!profileFullbodySlot) return;
+        profileFullbodySlot.innerHTML = '';
+        var badge = document.createElement('span');
+        badge.className = 'w-3 h-3 rotate-45 border border-gold/45 mb-3';
+        var title = document.createElement('p');
+        title.className = 'text-xs sm:text-sm tracking-[0.25em] text-gold/80';
+        title.textContent = '全身立繪預留區塊';
+        var hint = document.createElement('p');
+        hint.className = 'text-[11px] tracking-[0.14em] text-[#7E776D] mt-1.5';
+        hint.textContent = '（尚未偵測到全身立繪圖檔）';
+        profileFullbodySlot.appendChild(badge);
+        profileFullbodySlot.appendChild(title);
+        profileFullbodySlot.appendChild(hint);
+      }
+
+      function openCharacterProfile(charId) {
+        var char = getCharacterById(charId);
+        if (!char || !char.hasProfile || !profileOverlay || !profilePanel) return;
+
+        if (profileRoleEl) profileRoleEl.textContent = char.role || '';
+        if (profileNameEl) profileNameEl.textContent = char.name || '';
+        if (profileAgeEl) profileAgeEl.textContent = char.age || '未填寫';
+        if (profileHeightEl) profileHeightEl.textContent = char.height || '未填寫';
+        if (profileBioEl) profileBioEl.textContent = char.bio || '';
+
+        if (profileFullbodySlot) {
+          profileFullbodySlot.innerHTML = '';
+          if (char.fullBodyUrl) {
+            var fullImg = document.createElement('img');
+            fullImg.src = char.fullBodyUrl;
+            fullImg.alt = char.name + ' 全身立繪';
+            fullImg.className = 'w-full h-full max-h-[460px] object-contain';
+            fullImg.addEventListener('error', renderFullbodyPlaceholder);
+            profileFullbodySlot.appendChild(fullImg);
+          } else {
+            renderFullbodyPlaceholder();
+          }
+        }
+
+        profileOverlay.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+
+        requestAnimationFrame(function () {
+          profileOverlay.classList.remove('opacity-0');
+          profileOverlay.classList.add('opacity-100');
+          profilePanel.classList.remove('translate-y-4', 'opacity-0');
+          profilePanel.classList.add('translate-y-0', 'opacity-100');
+        });
+      }
+
+      function closeCharacterProfile() {
+        if (!profileOverlay || !profilePanel) return;
+        profileOverlay.classList.remove('opacity-100');
+        profileOverlay.classList.add('opacity-0');
+        profilePanel.classList.remove('translate-y-0', 'opacity-100');
+        profilePanel.classList.add('translate-y-4', 'opacity-0');
+
+        setTimeout(function () {
+          profileOverlay.classList.add('hidden');
+          document.body.style.overflow = '';
+        }, 360);
+      }
+
+      if (closeProfileBtn) {
+        closeProfileBtn.addEventListener('click', closeCharacterProfile);
+      }
+
+      if (profileOverlay) {
+        profileOverlay.addEventListener('click', function (e) {
+          if (e.target === profileOverlay) {
+            closeCharacterProfile();
+          }
+        });
+      }
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && profileOverlay && !profileOverlay.classList.contains('hidden')) {
+          closeCharacterProfile();
+        }
+      });
 
       function getCharacterById(id) {
         return characters.find(function (c) {
@@ -780,6 +981,20 @@
         }
       }
 
+      function createProfileMiniButton(char) {
+        var docBtn = document.createElement('button');
+        docBtn.type = 'button';
+        docBtn.setAttribute('aria-label', '開啟 ' + char.name + ' 個人檔案');
+        docBtn.className =
+          'mt-1.5 px-2.5 py-0.5 text-[10px] tracking-[0.2em] text-gold bg-gold/10 hover:bg-gold hover:text-ink border border-gold/55 rounded-full transition-all duration-200 cursor-pointer';
+        docBtn.textContent = '檔案';
+        docBtn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          openCharacterProfile(char.id);
+        });
+        return docBtn;
+      }
+
       function renderRelationStage() {
         if (!linesSvg || !nodesLayer) return;
 
@@ -827,35 +1042,54 @@
           labelEl.textContent = item.bidirectional ? '⇄ ' + item.label : item.label;
           nodesLayer.appendChild(labelEl);
 
+          var peerWrapper = document.createElement('div');
+          peerWrapper.style.left = px + '%';
+          peerWrapper.style.top = py + '%';
+          peerWrapper.className =
+            'bubble-node absolute -translate-x-1/2 -translate-y-1/2 z-20 flex flex-col items-center';
+
           var peerBtn = document.createElement('button');
           peerBtn.type = 'button';
-          peerBtn.style.left = px + '%';
-          peerBtn.style.top = py + '%';
           peerBtn.setAttribute('aria-label', '切換焦點至 ' + item.character.name);
           peerBtn.className =
-            'bubble-node absolute -translate-x-1/2 -translate-y-1/2 z-20 w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden bg-ink-light/95 border border-gold/60 hover:border-gold flex flex-col items-center justify-center p-1.5 text-center shadow-lg cursor-pointer group';
+            'w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden bg-ink-light/95 border border-gold/60 hover:border-gold flex flex-col items-center justify-center p-1.5 text-center shadow-lg cursor-pointer group';
 
           populateBubbleContent(peerBtn, item.character, false);
           peerBtn.addEventListener('click', function () {
             setActiveCenter(item.character.id);
           });
 
-          nodesLayer.appendChild(peerBtn);
+          peerWrapper.appendChild(peerBtn);
+          if (item.character.hasProfile) {
+            peerWrapper.appendChild(createProfileMiniButton(item.character));
+          }
+
+          nodesLayer.appendChild(peerWrapper);
         });
 
+        var centerWrapper = document.createElement('div');
+        centerWrapper.style.left = cx + '%';
+        centerWrapper.style.top = cy + '%';
+        centerWrapper.className =
+          'absolute -translate-x-1/2 -translate-y-1/2 z-20 flex flex-col items-center';
+
         var centerNode = document.createElement('div');
-        centerNode.style.left = cx + '%';
-        centerNode.style.top = cy + '%';
         centerNode.className =
-          'bubble-center absolute -translate-x-1/2 -translate-y-1/2 z-20 w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden bg-ink border-2 border-gold flex flex-col items-center justify-center p-1 text-center relative';
+          'bubble-center w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden bg-ink border-2 border-gold flex flex-col items-center justify-center p-1 text-center relative';
 
         populateBubbleContent(centerNode, centerChar, true);
-        nodesLayer.appendChild(centerNode);
+        centerWrapper.appendChild(centerNode);
+
+        if (centerChar.hasProfile) {
+          centerWrapper.appendChild(createProfileMiniButton(centerChar));
+        }
+
+        nodesLayer.appendChild(centerWrapper);
 
         if (connectedPeers.length === 0) {
           var emptyHint = document.createElement('div');
           emptyHint.style.left = '50%';
-          emptyHint.style.top = '74%';
+          emptyHint.style.top = '78%';
           emptyHint.className =
             'absolute -translate-x-1/2 -translate-y-1/2 z-20 px-3.5 py-1 text-[11px] sm:text-xs tracking-[0.25em] text-[#8E877D] border border-gold/20 rounded-full bg-ink/80 whitespace-nowrap';
           emptyHint.textContent = '関係線未登録';
@@ -914,6 +1148,11 @@
           itemWrapper.appendChild(btn);
           itemWrapper.appendChild(nameLabel);
           itemWrapper.appendChild(roleLabel);
+
+          if (char.hasProfile) {
+            itemWrapper.appendChild(createProfileMiniButton(char));
+          }
+
           avatarLinksContainer.appendChild(itemWrapper);
         });
       }
