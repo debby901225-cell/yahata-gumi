@@ -39,9 +39,6 @@
   </script>
 
   <style>
-    /* =========================================================================
-       全域基礎與日系極簡美學設定
-       ========================================================================= */
     :root {
       --bg-ink: #0B1013;
       --accent-gold: #967249;
@@ -61,7 +58,6 @@
       overflow-x: hidden;
     }
 
-    /* 細緻暗紋宣紙肌理背景 */
     .washi-bg {
       background-color: #0B1013;
       background-image:
@@ -75,9 +71,6 @@
         );
     }
 
-    /* =========================================================================
-       暗色日式障子紙門 (Shoji) 入場動畫與質感
-       ========================================================================= */
     .shoji-door {
       transition: transform 1.45s cubic-bezier(0.77, 0, 0.175, 1);
       will-change: transform;
@@ -96,7 +89,6 @@
         );
     }
 
-    /* 漆黑檀木障子格柵 */
     .shoji-grid {
       background-image:
         linear-gradient(to right, #06090B 3px, transparent 3px),
@@ -112,17 +104,11 @@
       transform: translateX(100%);
     }
 
-    /* =========================================================================
-       純色墨色簾幕漸變轉場 (無任何圖案或文字)
-       ========================================================================= */
     #page-curtain {
       background-color: #0B1013;
       transition: opacity 0.55s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* =========================================================================
-       橫濱街景輪播與漸變特效
-       ========================================================================= */
     .slide-item {
       transition: opacity 1.2s ease-in-out, transform 6.5s ease-out;
     }
@@ -137,15 +123,11 @@
       transform: scale(1);
     }
 
-    /* 垂直書寫 */
     .writing-vertical {
       writing-mode: vertical-rl;
       text-orientation: upright;
     }
 
-    /* =========================================================================
-       人物關關係圖氣泡動效
-       ========================================================================= */
     .bubble-node {
       transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease, border-color 0.35s ease;
     }
@@ -164,7 +146,6 @@
       background-color: rgba(150, 114, 73, 0.12);
     }
 
-    /* 自訂捲軸 */
     ::-webkit-scrollbar {
       width: 5px;
       height: 5px;
@@ -183,9 +164,6 @@
 </head>
 <body class="bg-ink text-[#E5E0D8] antialiased selection:bg-gold selection:text-ink">
 
-  <!-- =========================================================================
-       純色墨色簾幕轉場遮罩 (純粹 #0B1013 漸變，無任何圖案或文字)
-       ========================================================================= -->
   <div
     id="page-curtain"
     aria-hidden="true"
@@ -197,7 +175,6 @@
        ========================================================================= -->
   <main id="page-home" class="relative w-full min-h-[100dvh] flex flex-col lg:flex-row overflow-hidden bg-ink">
 
-    <!-- 暗色日式障子紙門 (Shoji) 開場覆蓋層 -->
     <div id="shoji-overlay" class="fixed inset-0 z-50 flex pointer-events-none overflow-hidden">
       <div
         id="shoji-left"
@@ -216,7 +193,6 @@
       </div>
     </div>
 
-    <!-- 右上角「障子開閉」重播按鈕 -->
     <button
       id="replay-shoji-btn"
       type="button"
@@ -226,7 +202,6 @@
       障子開閉
     </button>
 
-    <!-- 左側 / 上方：橫濱街景氛圍輪播區 -->
     <section
       id="hero-slideshow"
       aria-label="橫濱街景氛圍輪播"
@@ -243,4 +218,290 @@
           <div class="absolute inset-0 bg-gradient-to-b from-ink/50 via-transparent to-ink"></div>
         </div>
 
-        <div class="slide-item slide-inactive absolute inset-
+        <div class="slide-item slide-inactive absolute inset-0" data-slide="1">
+          <img
+            src="https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=1400&q=80"
+            alt="橫濱雨夜街巷"
+            class="w-full h-full object-cover brightness-[0.52] contrast-[1.15] saturate-[0.7]"
+            onerror="this.style.display='none'"
+          />
+          <div class="absolute inset-0 bg-gradient-to-b from-ink/50 via-transparent to-ink"></div>
+        </div>
+
+        <div class="slide-item slide-inactive absolute inset-0" data-slide="2">
+          <img
+            src="https://images.unsplash.com/photo-1536098561742-ca998e48cbcc?auto=format&fit=crop&w=1400&q=80"
+            alt="橫濱港灣燈影"
+            class="w-full h-full object-cover brightness-[0.52] contrast-[1.12] saturate-[0.7]"
+            onerror="this.style.display='none'"
+          />
+          <div class="absolute inset-0 bg-gradient-to-b from-ink/50 via-transparent to-ink"></div>
+        </div>
+
+        <div class="slide-item slide-inactive absolute inset-0" data-slide="3">
+          <img
+            src="https://images.unsplash.com/photo-1513407030348-c983a97b98d8?auto=format&fit=crop&w=1400&q=80"
+            alt="橫濱深夜靜謐"
+            class="w-full h-full object-cover brightness-[0.5] contrast-[1.15] saturate-[0.65]"
+            onerror="this.style.display='none'"
+          />
+          <div class="absolute inset-0 bg-gradient-to-b from-ink/50 via-transparent to-ink"></div>
+        </div>
+      </div>
+
+      <div class="hidden lg:block absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-ink to-transparent pointer-events-none"></div>
+      <div class="lg:hidden absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-ink to-transparent pointer-events-none"></div>
+
+      <div class="absolute top-5 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
+        <button type="button" class="slide-dot w-7 h-[2px] bg-gold transition-all duration-300" data-index="0" aria-label="第 1 張"></button>
+        <button type="button" class="slide-dot w-7 h-[2px] bg-gold/30 transition-all duration-300" data-index="1" aria-label="第 2 張"></button>
+        <button type="button" class="slide-dot w-7 h-[2px] bg-gold/30 transition-all duration-300" data-index="2" aria-label="第 3 張"></button>
+        <button type="button" class="slide-dot w-7 h-[2px] bg-gold/30 transition-all duration-300" data-index="3" aria-label="第 4 張"></button>
+      </div>
+
+      <div class="absolute top-6 left-5 sm:top-8 sm:left-8 z-20 flex items-start gap-2.5 pointer-events-none">
+        <span class="w-[1px] h-16 bg-gold/55 mt-1"></span>
+        <p class="writing-vertical text-[11px] sm:text-xs tracking-[0.35em] text-[#D8D1C5]/80 font-light">
+          横浜・みなとみらい
+        </p>
+      </div>
+    </section>
+
+    <div class="relative z-20 flex items-center justify-center lg:hidden -mt-2 mb-1">
+      <div class="w-full h-[1px] bg-gold/25"></div>
+      <div class="absolute w-3 h-3 rotate-45 border border-gold/60 bg-ink"></div>
+    </div>
+
+    <section class="relative w-full lg:w-1/2 flex-1 lg:h-[100dvh] bg-ink flex flex-col items-center justify-between px-6 py-6 sm:py-10 lg:py-14 lg:border-l lg:border-gold/15">
+
+      <div class="hidden lg:flex flex-col items-center gap-2 pt-4">
+        <span class="text-[11px] tracking-[0.45em] text-gold/75 uppercase">YAHATA-GUMI</span>
+        <div class="w-10 h-[1px] bg-gold/35"></div>
+      </div>
+
+      <!-- 中央：八幡組家紋視覺 (已移除備援 SVG，直接讀取 dai.png) -->
+      <div class="w-full max-w-[240px] sm:max-w-[290px] lg:max-w-[330px] aspect-square my-auto flex flex-col items-center justify-center relative select-none">
+        <img
+          id="emblem-img"
+          src="./dai.png"
+          alt="八幡組家紋"
+          class="w-full h-full object-contain mix-blend-lighten contrast-[1.05]"
+        />
+        <p id="emblem-error-hint" class="hidden text-xs tracking-[0.15em] text-gold/80 text-center px-4">
+          找不到圖檔（請確認 GitHub 專案根目錄是否有小寫檔名的 dai.png）
+        </p>
+      </div>
+
+      <div class="w-full max-w-[280px] sm:max-w-[320px] flex flex-col items-center gap-4 pt-3">
+        <button
+          id="enter-archive-btn"
+          type="button"
+          style="letter-spacing: 0.45em; padding-left: 0.45em;"
+          class="w-full h-12 sm:h-13 bg-gold hover:bg-gold-light active:scale-[0.99] text-ink font-semibold text-sm sm:text-base rounded flex items-center justify-center transition-all duration-300 shadow-[0_8px_24px_rgba(150,114,73,0.22)] cursor-pointer"
+        >
+          入場
+        </button>
+
+        <p class="text-[10px] sm:text-[11px] tracking-[0.38em] text-[#8E877D] uppercase text-center">
+          YAHATA-GUMI ARCHIVES
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <!-- =========================================================================
+       第二頁：八幡組史錄本編 (#page-content)
+       ========================================================================= -->
+  <div id="page-content" class="hidden min-h-[100dvh] washi-bg text-[#E5E0D8] pb-16 sm:pb-24">
+
+    <header class="sticky top-0 z-40 bg-ink/90 backdrop-blur-md border-b border-gold/20">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-2">
+        <button
+          type="button"
+          data-go-home
+          class="flex items-center gap-2 text-gold hover:text-gold-light transition-colors cursor-pointer group"
+        >
+          <span class="w-2 h-2 rotate-45 border border-gold group-hover:bg-gold/30 transition-colors"></span>
+          <span class="text-sm sm:text-base font-medium tracking-[0.25em]">八幡組</span>
+        </button>
+
+        <nav aria-label="章節導覽" class="flex items-center gap-4 sm:gap-8 text-xs sm:text-sm tracking-[0.2em] text-[#C8C0B4]">
+          <a href="#section-creed" class="hover:text-gold transition-colors py-1">綱領</a>
+          <a href="#section-history" class="hover:text-gold transition-colors py-1">沿革</a>
+          <a href="#section-relations" class="hover:text-gold transition-colors py-1">人物關關係圖</a>
+        </nav>
+
+        <button
+          type="button"
+          data-go-home
+          class="px-2.5 sm:px-3.5 py-1.5 text-[11px] sm:text-xs tracking-[0.18em] text-gold border border-gold/45 rounded hover:bg-gold/15 hover:border-gold transition-all cursor-pointer"
+        >
+          入口へ戻る
+        </button>
+      </div>
+    </header>
+
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 pt-10 sm:pt-14 pb-6 sm:pb-8 text-center">
+      <p class="text-[10px] sm:text-xs tracking-[0.42em] text-gold/80 uppercase mb-2">
+        YAHATA-GUMI ARCHIVES
+      </p>
+      <h1 class="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-[0.35em] pl-[0.35em] text-gold">
+        八幡組史錄
+      </h1>
+      <div class="flex items-center justify-center gap-3 mt-4">
+        <span class="w-12 sm:w-16 h-[1px] bg-gold/35"></span>
+        <span class="w-2 h-2 rotate-45 border border-gold/70"></span>
+        <span class="w-12 sm:w-16 h-[1px] bg-gold/35"></span>
+      </div>
+    </div>
+
+    <!-- 區塊一：八幡組綱領 -->
+    <section id="section-creed" class="scroll-mt-20 max-w-3xl mx-auto px-4 sm:px-6 mb-14 sm:mb-20">
+      <div class="border border-gold/45 p-1.5 sm:p-2 rounded bg-ink-card/80 shadow-[0_10px_30px_rgba(0,0,0,0.45)]">
+        <div class="relative border border-gold/30 px-5 py-4 sm:px-10 sm:py-5 rounded-sm flex flex-col items-center justify-center text-center">
+          <span class="absolute top-1.5 left-1.5 w-2.5 h-2.5 border-t border-l border-gold/75"></span>
+          <span class="absolute top-1.5 right-1.5 w-2.5 h-2.5 border-t border-r border-gold/75"></span>
+          <span class="absolute bottom-1.5 left-1.5 w-2.5 h-2.5 border-b border-l border-gold/75"></span>
+          <span class="absolute bottom-1.5 right-1.5 w-2.5 h-2.5 border-b border-r border-gold/75"></span>
+
+          <h2 class="text-[11px] sm:text-xs tracking-[0.32em] text-gold/90 font-medium mb-2 sm:mb-2.5">
+            ── 八幡組綱領 ──
+          </h2>
+
+          <p class="text-xs sm:text-sm md:text-base tracking-[0.16em] sm:tracking-[0.22em] leading-relaxed text-[#EDE8DF] font-medium">
+            一一八幡組は侠道精神に則り国家社会の興隆に貢献せんことを期す
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 區塊二：沿革・大事紀 -->
+    <section id="section-history" class="scroll-mt-20 max-w-4xl mx-auto px-4 sm:px-6 mb-16 sm:mb-24">
+      <div class="text-center mb-10 sm:mb-14">
+        <p class="text-[10px] sm:text-xs tracking-[0.4em] text-gold/75 uppercase mb-1.5">CHRONICLE</p>
+        <h2 class="text-xl sm:text-2xl font-semibold tracking-[0.3em] pl-[0.3em] text-gold">沿革・大事紀</h2>
+      </div>
+
+      <div class="relative">
+        <div class="absolute top-2 bottom-2 left-4 md:left-1/2 md:-translate-x-1/2 w-[1px] bg-gradient-to-b from-gold/20 via-gold/55 to-gold/20"></div>
+
+        <div class="space-y-8 sm:space-y-10">
+          <div class="relative flex flex-col md:flex-row md:items-center justify-between pl-11 md:pl-0">
+            <div class="md:w-[45%] md:text-right md:pr-8">
+              <span class="inline-block text-xs sm:text-sm font-semibold tracking-[0.25em] text-gold mb-1">1977年</span>
+              <p class="text-sm sm:text-base font-medium tracking-[0.15em] text-[#F0ECE3] leading-relaxed">
+                八幡組脫離原生組織山和會成立
+              </p>
+            </div>
+            <div class="absolute left-[11px] md:left-1/2 top-1.5 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 w-2.5 h-2.5 rotate-45 bg-ink border border-gold shadow-[0_0_10px_rgba(150,114,73,0.6)]"></div>
+            <div class="hidden md:block md:w-[45%]"></div>
+          </div>
+
+          <div class="relative flex flex-col md:flex-row md:items-center justify-between pl-11 md:pl-0">
+            <div class="hidden md:block md:w-[45%]"></div>
+            <div class="absolute left-[11px] md:left-1/2 top-1.5 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 w-2.5 h-2.5 rotate-45 bg-ink border border-gold shadow-[0_0_10px_rgba(150,114,73,0.6)]"></div>
+            <div class="md:w-[45%] md:pl-8">
+              <span class="inline-block text-xs sm:text-sm font-semibold tracking-[0.25em] text-gold mb-1">2002年</span>
+              <p class="text-sm sm:text-base font-medium tracking-[0.15em] text-[#F0ECE3] leading-relaxed">
+                組長千金八幡真禮與組內成員齋藤私奔
+              </p>
+            </div>
+          </div>
+
+          <div class="relative flex flex-col md:flex-row md:items-center justify-between pl-11 md:pl-0">
+            <div class="md:w-[45%] md:text-right md:pr-8">
+              <span class="inline-block text-xs sm:text-sm font-semibold tracking-[0.25em] text-gold mb-1">2011年</span>
+              <p class="text-sm sm:text-base font-medium tracking-[0.15em] text-[#F0ECE3] leading-relaxed">
+                八幡龍司之外孫女，凪回歸八幡組
+              </p>
+            </div>
+            <div class="absolute left-[11px] md:left-1/2 top-1.5 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 w-2.5 h-2.5 rotate-45 bg-ink border border-gold shadow-[0_0_10px_rgba(150,114,73,0.6)]"></div>
+            <div class="hidden md:block md:w-[45%]"></div>
+          </div>
+
+          <div class="relative flex flex-col md:flex-row md:items-center justify-between pl-11 md:pl-0">
+            <div class="hidden md:block md:w-[45%]"></div>
+            <div class="absolute left-[11px] md:left-1/2 top-1.5 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 w-2.5 h-2.5 rotate-45 bg-ink border border-gold shadow-[0_0_10px_rgba(150,114,73,0.6)]"></div>
+            <div class="md:w-[45%] md:pl-8">
+              <span class="inline-block text-xs sm:text-sm font-semibold tracking-[0.25em] text-gold mb-1">2021</span>
+              <p class="text-sm sm:text-base font-medium tracking-[0.15em] text-[#F0ECE3] leading-relaxed">
+                凪正式入組
+              </p>
+            </div>
+          </div>
+
+          <div class="relative flex flex-col md:flex-row md:items-center justify-between pl-11 md:pl-0">
+            <div class="md:w-[45%] md:text-right md:pr-8">
+              <span class="inline-block text-xs sm:text-sm font-semibold tracking-[0.25em] text-gold">2026-現今</span>
+            </div>
+            <div class="absolute left-[11px] md:left-1/2 top-1.5 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 w-3 h-3 rotate-45 bg-gold border border-gold-light shadow-[0_0_14px_rgba(150,114,73,0.85)]"></div>
+            <div class="hidden md:block md:w-[45%]"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 區塊三：人物關關係圖 -->
+    <section id="section-relations" class="scroll-mt-20 max-w-4xl mx-auto px-4 sm:px-6">
+      <div class="text-center mb-8 sm:mb-10">
+        <p class="text-[10px] sm:text-xs tracking-[0.4em] text-gold/75 uppercase mb-1.5">RELATIONSHIP MAP</p>
+        <h2 class="text-xl sm:text-2xl font-semibold tracking-[0.3em] pl-[0.3em] text-gold">人物關關係圖</h2>
+        <p class="text-[11px] sm:text-xs tracking-[0.18em] text-[#9A9287] mt-2">
+          點擊氣泡節點或下方頭像切換焦點人物
+        </p>
+      </div>
+
+      <div class="border border-gold/30 rounded bg-ink-card/75 p-4 sm:p-7 relative">
+        <span class="absolute top-2 left-2 w-3 h-3 border-t border-l border-gold/55 pointer-events-none"></span>
+        <span class="absolute top-2 right-2 w-3 h-3 border-t border-r border-gold/55 pointer-events-none"></span>
+        <span class="absolute bottom-2 left-2 w-3 h-3 border-b border-l border-gold/55 pointer-events-none"></span>
+        <span class="absolute bottom-2 right-2 w-3 h-3 border-b border-r border-gold/55 pointer-events-none"></span>
+
+        <div
+          id="relation-stage"
+          class="relative w-full h-[440px] sm:h-[500px] rounded bg-ink/80 border border-gold/15 overflow-hidden mb-7 select-none"
+        >
+          <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div class="w-48 h-48 sm:w-64 sm:h-64 rounded-full border border-gold/10"></div>
+            <div class="absolute w-80 h-80 sm:w-[26rem] sm:h-[26rem] rounded-full border border-dashed border-gold/10"></div>
+          </div>
+
+          <svg
+            id="relation-lines-svg"
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+            class="absolute inset-0 w-full h-full z-10 pointer-events-none"
+          ></svg>
+
+          <div id="relation-nodes-layer" class="absolute inset-0 w-full h-full"></div>
+        </div>
+
+        <div class="flex items-center gap-3 mb-6">
+          <div class="flex-1 h-[1px] bg-gold/20"></div>
+          <span class="text-[10px] sm:text-[11px] tracking-[0.3em] text-gold/75">登場人物一覧（全十三名）</span>
+          <div class="flex-1 h-[1px] bg-gold/20"></div>
+        </div>
+
+        <div
+          id="characterAvatarLinks"
+          role="list"
+          aria-label="全員角色圓形氣泡連結"
+          class="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-7 gap-y-6 gap-x-2 sm:gap-x-3 max-w-4xl mx-auto justify-items-center"
+        ></div>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // 嘗試多種常見大小寫與副檔名讀取首頁家紋圖檔
+      const emblemImg = document.getElementById('emblem-img');
+      const emblemErrorHint = document.getElementById('emblem-error-hint');
+      if (emblemImg) {
+        const candidatePaths = ['./dai.png', './dai.PNG', './DAI.png', './DAI.PNG', './dai.jpg', './dai.JPG'];
+        let candidateIndex = 0;
+        emblemImg.addEventListener('error', () => {
+          candidateIndex += 1;
+          if (candidateIndex < candidatePaths.length) {
+            emblemImg.src = candidatePaths[candidateIndex];
