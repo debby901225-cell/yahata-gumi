@@ -1041,7 +1041,7 @@
           labelEl.textContent = item.bidirectional ? '⇄ ' + item.label : item.label;
           nodesLayer.appendChild(labelEl);
 
-          /* 周圍氣泡僅切換焦點，不顯示「檔案」按鈕 */
+          /* 周圍氣泡：僅提供切換焦點，不顯示「檔案」按鈕 */
           var peerBtn = document.createElement('button');
           peerBtn.type = 'button';
           peerBtn.style.left = px + '%';
@@ -1058,7 +1058,7 @@
           nodesLayer.appendChild(peerBtn);
         });
 
-        /* 正中央焦點氣泡：下方專屬顯示「檔案」按鈕 */
+        /* 正中央焦點氣泡：僅此處下方顯示「檔案」按鈕 */
         var centerWrapper = document.createElement('div');
         centerWrapper.style.left = cx + '%';
         centerWrapper.style.top = cy + '%';
