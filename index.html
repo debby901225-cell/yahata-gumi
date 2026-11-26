@@ -273,7 +273,7 @@
       animation: diamondPulse 2.8s infinite ease-in-out;
     }
 
-    /* 人物相関図圓形佔位節點 */
+    /* 人物關係圖圓形佔位節點 */
     .node-circle {
       background: radial-gradient(circle at 35% 35%, #161e24 0%, #0B1013 82%);
       transition: transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
@@ -282,6 +282,15 @@
       transform: translateY(-3px);
       border-color: #b88f5e;
       box-shadow: 0 8px 24px rgba(150, 114, 73, 0.25);
+    }
+
+    /* 隱藏橫向捲軸但保留手機滑動體驗 */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
     }
   </style>
 </head>
@@ -535,7 +544,7 @@
             href="#relations"
             class="py-1.5 text-antiqueGold/85 hover:text-goldBright border-b border-transparent hover:border-antiqueGold transition-all"
           >
-            相関図
+            關係圖
           </a>
           <button
             type="button"
@@ -770,82 +779,64 @@
       </div>
 
       <!-- =====================================================
-           第三區塊：【人物相関図預留區】圓形佔位節點示意
+           第三區塊：【人物關係圖】焦點互動關係網（支援擴充至 15 人）
            ===================================================== -->
       <section id="relations" aria-labelledby="relations-heading" class="scroll-mt-24">
-        <div class="text-center mb-10 sm:mb-12">
+        <div class="text-center mb-8 sm:mb-10">
           <span class="font-sansJp text-[10px] sm:text-xs tracking-[0.4em] pl-[0.4em] text-mutedGold block mb-1.5">
             RELATIONSHIP CHART
           </span>
           <h2 id="relations-heading" class="text-xl sm:text-2xl md:text-3xl font-bold tracking-[0.35em] pl-[0.35em] text-antiqueGold">
-            人物相関図
+            人物關係圖
           </h2>
+          <p class="font-sansJp text-xs text-mutedGold/85 mt-2.5 tracking-[0.15em]">
+            點擊任一圓形頭像切換視覺中心，檢視雙向心態與關係脈絡
+          </p>
         </div>
 
-        <!-- 人物關係網預留舞台框 -->
-        <div class="relative border border-antiqueGold/45 bg-[#0E1418]/85 rounded-[2px] p-6 sm:p-10 md:p-12 overflow-hidden">
+        <!-- 人物關係互動主容器 -->
+        <div class="relative border border-antiqueGold/45 bg-[#0E1418]/90 rounded-[2px] p-4 sm:p-8 md:p-10 overflow-hidden shadow-2xl">
           <span class="plaque-corner tl"></span>
           <span class="plaque-corner tr"></span>
           <span class="plaque-corner bl"></span>
           <span class="plaque-corner br"></span>
 
-          <!-- 圓形佔位節點與連線示意圖 -->
-          <div class="relative max-w-2xl mx-auto py-6 sm:py-8 flex flex-col items-center">
+          <!-- 1. 陣營篩選列 -->
+          <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-5">
+            <button type="button" data-faction="ALL" class="faction-btn px-3.5 py-1.5 text-xs tracking-[0.2em] pl-[calc(0.875rem+0.2em)] bg-antiqueGold text-[#0B1013] font-bold border border-antiqueGold rounded-[2px] transition-all cursor-pointer">
+              全部
+            </button>
+            <button type="button" data-faction="凪派" class="faction-btn px-3.5 py-1.5 text-xs tracking-[0.2em] pl-[calc(0.875rem+0.2em)] bg-[#0B1013] text-antiqueGold border border-antiqueGold/45 hover:border-antiqueGold rounded-[2px] transition-all cursor-pointer">
+              凪派
+            </button>
+            <button type="button" data-faction="中立派" class="faction-btn px-3.5 py-1.5 text-xs tracking-[0.2em] pl-[calc(0.875rem+0.2em)] bg-[#0B1013] text-antiqueGold border border-antiqueGold/45 hover:border-antiqueGold rounded-[2px] transition-all cursor-pointer">
+              中立派
+            </button>
+          </div>
 
-            <!-- 頂層核心圓形節點 -->
-            <div class="flex flex-col items-center z-10">
-              <div class="node-circle w-20 h-20 sm:w-24 sm:h-24 rounded-full border-2 border-antiqueGold flex flex-col items-center justify-center shadow-lg">
-                <span class="text-xs sm:text-sm font-bold tracking-[0.15em] text-antiqueGold">八幡 龍司</span>
-                <span class="font-sansJp text-[9px] text-mutedGold mt-0.5">圓形頭像預留</span>
-              </div>
+          <!-- 2. 角色圓形頭像快速列（可橫向滑動，方便日後擴充至 15 人） -->
+          <div id="characterRoster" class="flex items-center justify-start sm:justify-center gap-3 sm:gap-5 overflow-x-auto no-scrollbar py-3 px-2 border-y border-antiqueGold/20 mb-6 sm:mb-8">
+            <!-- 由 JS 動態渲染圓形頭像快速列 -->
+          </div>
+
+          <!-- 3. 中央焦點關係畫布（SVG 連線 + 圓形頭像節點） -->
+          <div id="focusGraphStage" class="relative w-full h-[330px] sm:h-[400px] bg-[#0B1013]/90 border border-antiqueGold/30 rounded-[2px] overflow-hidden mb-6 sm:mb-8 select-none">
+            <!-- 背景禪意同心圓輔助線 -->
+            <div aria-hidden="true" class="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div class="w-44 h-44 sm:w-60 sm:h-60 rounded-full border border-antiqueGold/10"></div>
+              <div class="absolute w-72 h-72 sm:w-96 sm:h-96 rounded-full border border-dashed border-antiqueGold/10"></div>
             </div>
 
-            <!-- 垂直連接線 -->
-            <div aria-hidden="true" class="w-[1px] h-8 sm:h-10 bg-antiqueGold/55"></div>
+            <!-- SVG 連線層 -->
+            <svg id="relationLinesSvg" class="absolute inset-0 w-full h-full pointer-events-none z-10"></svg>
 
-            <!-- 橫向分支連接線 -->
-            <div aria-hidden="true" class="w-48 sm:w-72 h-[1px] bg-antiqueGold/55"></div>
+            <!-- 圓形頭像節點層 -->
+            <div id="relationNodesLayer" class="absolute inset-0 z-20"></div>
+          </div>
 
-            <!-- 下層三個圓形佔位節點示意 -->
-            <div class="w-full max-w-lg grid grid-cols-3 gap-3 sm:gap-6 mt-0 z-10">
-              <!-- 節點 1 -->
-              <div class="flex flex-col items-center">
-                <div aria-hidden="true" class="w-[1px] h-6 bg-antiqueGold/55"></div>
-                <div class="node-circle w-16 h-16 sm:w-20 sm:h-20 rounded-full border border-dashed border-antiqueGold/75 flex flex-col items-center justify-center text-center px-1">
-                  <span class="text-[11px] sm:text-xs font-semibold text-washiText">八幡 真禮</span>
-                  <span class="font-sansJp text-[8px] sm:text-[9px] text-mutedGold mt-0.5">待補資料</span>
-                </div>
-              </div>
-
-              <!-- 節點 2（中心焦點：凪） -->
-              <div class="flex flex-col items-center">
-                <div aria-hidden="true" class="w-[1px] h-6 bg-antiqueGold/85"></div>
-                <div class="node-circle w-[72px] h-[72px] sm:w-[88px] sm:h-[88px] rounded-full border-2 border-antiqueGold flex flex-col items-center justify-center text-center px-1 shadow-[0_0_20px_rgba(150,114,73,0.2)]">
-                  <span class="text-xs sm:text-sm font-bold text-antiqueGold">凪</span>
-                  <span class="font-sansJp text-[8px] sm:text-[9px] text-mutedGold mt-0.5">圓形頭像預留</span>
-                </div>
-              </div>
-
-              <!-- 節點 3 -->
-              <div class="flex flex-col items-center">
-                <div aria-hidden="true" class="w-[1px] h-6 bg-antiqueGold/55"></div>
-                <div class="node-circle w-16 h-16 sm:w-20 sm:h-20 rounded-full border border-dashed border-antiqueGold/75 flex flex-col items-center justify-center text-center px-1">
-                  <span class="text-[11px] sm:text-xs font-semibold text-washiText">齋藤</span>
-                  <span class="font-sansJp text-[8px] sm:text-[9px] text-mutedGold mt-0.5">待補資料</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- 預留狀態說明框 -->
-            <div class="mt-10 pt-6 border-t border-antiqueGold/25 w-full text-center">
-              <span class="inline-block px-3 py-1 mb-2.5 text-[11px] tracking-[0.28em] pl-[calc(0.75rem+0.28em)] border border-antiqueGold/55 text-antiqueGold bg-[#0B1013]">
-                人物相関図 — 準備中
-              </span>
-              <p class="font-sansJp text-xs sm:text-sm text-washiText/80 leading-relaxed max-w-md mx-auto">
-                此區塊已為圓形角色頭像節點與關係連線預留版面。待您提供完整登場人物名單與彼此關係後，即可直接在此展開互動式關係圖。
-              </p>
-            </div>
-
+          <!-- 4. 下方焦點人物檔案與雙向心態對照卡 -->
+          <div id="focusDetailPanel" class="bg-[#0B1013] border border-antiqueGold/40 rounded-[2px] p-5 sm:p-7">
+            <!-- 由 JS 動態渲染焦點人物介紹與雙向關係台詞卡 -->
           </div>
         </div>
       </section>
@@ -1008,6 +999,7 @@
             pageContent.classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'instant' });
             triggerTimelineRevealCheck();
+            renderRelationChart();
           } else {
             pageContent.classList.add('hidden');
             pageHome.classList.remove('hidden');
@@ -1061,6 +1053,355 @@
           revealItems.forEach((item) => item.classList.add('is-visible'));
         }
       }
+
+      /* -----------------------------------------
+         E. 人物關係圖資料與互動引擎（支援擴充至 15 人）
+         ----------------------------------------- */
+      const charactersData = [
+        {
+          id: 'nagi',
+          name: '八幡凪',
+          faction: '凪派',
+          role: '少當家候補',
+          bio: '八幡龍司之外孫女，2011年回歸、2021年正式入組，背負著組內期望與改革目光的年輕候補。',
+          avatar: '' // 預留圖片網址，留空時自動顯示圓形佔位圈
+        },
+        {
+          id: 'kazuki',
+          name: '小泉一樹',
+          faction: '凪派',
+          role: '一般組員',
+          bio: '跟隨在八幡凪身邊的年輕組員，對少當家候補抱持高度忠誠。',
+          avatar: ''
+        },
+        {
+          id: 'ryuji',
+          name: '八幡龍司',
+          faction: '中立派',
+          role: '組長',
+          bio: '1977年率領八幡組脫離山和會獨立的現任組長，以嚴厲目光考驗著外孫女凪。',
+          avatar: ''
+        }
+      ];
+
+      const relationshipsData = [
+        {
+          source: 'nagi',
+          target: 'ryuji',
+          label: '祖孫',
+          forwardNote: '臭老頭',
+          reverseNote: '證明給我看吧',
+          type: '血緣'
+        },
+        {
+          source: 'kazuki',
+          target: 'nagi',
+          label: '派系・主從',
+          forwardNote: '誓死追隨少當家',
+          reverseNote: '可靠的得力助手',
+          type: '派系'
+        }
+      ];
+
+      let activeCharacterId = 'nagi'; // 預設以八幡凪為中心
+      let activeFactionFilter = 'ALL';
+
+      const characterRosterEl = document.getElementById('characterRoster');
+      const focusGraphStageEl = document.getElementById('focusGraphStage');
+      const relationLinesSvgEl = document.getElementById('relationLinesSvg');
+      const relationNodesLayerEl = document.getElementById('relationNodesLayer');
+      const focusDetailPanelEl = document.getElementById('focusDetailPanel');
+      const factionBtns = Array.from(document.querySelectorAll('.faction-btn'));
+
+      function getCharById(id) {
+        return charactersData.find((c) => c.id === id);
+      }
+
+      // 渲染上方角色圓形頭像快速列
+      function renderCharacterRoster() {
+        if (!characterRosterEl) return;
+        const filtered = activeFactionFilter === 'ALL'
+          ? charactersData
+          : charactersData.filter((c) => c.faction === activeFactionFilter);
+
+        characterRosterEl.innerHTML = filtered.map((char) => {
+          const isSelected = char.id === activeCharacterId;
+          const ringClass = isSelected
+            ? 'border-2 border-antiqueGold shadow-[0_0_16px_rgba(150,114,73,0.45)] scale-105'
+            : 'border border-dashed border-antiqueGold/55 opacity-80 hover:opacity-100';
+
+          const avatarInner = char.avatar
+            ? `<img src="${char.avatar}" alt="${char.name}" class="w-full h-full object-cover rounded-full" />`
+            : `<span class="text-xs sm:text-sm font-bold tracking-wider ${isSelected ? 'text-antiqueGold' : 'text-washiText'}">${char.name.slice(-2)}</span>`;
+
+          return `
+            <button
+              type="button"
+              data-char-id="${char.id}"
+              class="roster-char-btn shrink-0 flex flex-col items-center gap-1.5 px-2 py-1 cursor-pointer transition-transform focus:outline-none"
+            >
+              <div class="node-circle w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center overflow-hidden ${ringClass}">
+                ${avatarInner}
+              </div>
+              <span class="text-[11px] sm:text-xs tracking-[0.12em] ${isSelected ? 'text-antiqueGold font-bold' : 'text-washiText/85'}">
+                ${char.name}
+              </span>
+              <span class="font-sansJp text-[9px] px-1.5 py-0.2 border border-antiqueGold/30 text-mutedGold rounded-[1px]">
+                ${char.faction}
+              </span>
+            </button>
+          `;
+        }).join('');
+
+        characterRosterEl.querySelectorAll('.roster-char-btn').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            activeCharacterId = btn.dataset.charId;
+            renderRelationChart();
+          });
+        });
+      }
+
+      // 渲染中央焦點關係畫布（SVG 連線 + 圓形節點）
+      function renderFocusGraph() {
+        if (!focusGraphStageEl || !relationLinesSvgEl || !relationNodesLayerEl) return;
+        const centerChar = getCharById(activeCharacterId);
+        if (!centerChar) return;
+
+        // 找出與中心角色有直接連線的關係
+        const connectedEdges = relationshipsData.filter(
+          (rel) => rel.source === centerChar.id || rel.target === centerChar.id
+        );
+
+        const stageRect = focusGraphStageEl.getBoundingClientRect();
+        const width = stageRect.width || 600;
+        const height = stageRect.height || 360;
+        const cx = width / 2;
+        const cy = height / 2;
+        const radius = Math.min(width, height) * (width < 640 ? 0.33 : 0.34);
+
+        relationLinesSvgEl.setAttribute('viewBox', `0 0 ${width} ${height}`);
+        relationLinesSvgEl.innerHTML = '';
+        relationNodesLayerEl.innerHTML = '';
+
+        // 放置中心角色圓形節點
+        const centerAvatarHtml = centerChar.avatar
+          ? `<img src="${centerChar.avatar}" alt="${centerChar.name}" class="w-full h-full object-cover rounded-full" />`
+          : `<span class="text-sm sm:text-base font-bold tracking-[0.15em] text-antiqueGold">${centerChar.name}</span>
+             <span class="font-sansJp text-[9px] text-mutedGold mt-0.5">${centerChar.role}</span>`;
+
+        const centerNode = document.createElement('div');
+        centerNode.style.left = `${cx}px`;
+        centerNode.style.top = `${cy}px`;
+        centerNode.className = 'absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center z-20';
+        centerNode.innerHTML = `
+          <div class="node-circle w-22 h-22 sm:w-26 sm:h-26 w-[86px] h-[86px] sm:w-[104px] sm:h-[104px] rounded-full border-2 border-antiqueGold flex flex-col items-center justify-center text-center px-2 shadow-[0_0_28px_rgba(150,114,73,0.3)] overflow-hidden">
+            ${centerAvatarHtml}
+          </div>
+          <span class="mt-1.5 px-2 py-0.5 bg-antiqueGold text-[#0B1013] font-bold text-[10px] tracking-[0.18em] pl-[calc(0.5rem+0.18em)] rounded-[1px]">
+            ${centerChar.faction}
+          </span>
+        `;
+        relationNodesLayerEl.appendChild(centerNode);
+
+        // 環繞排列關聯角色
+        const count = connectedEdges.length;
+        connectedEdges.forEach((rel, idx) => {
+          const otherId = rel.source === centerChar.id ? rel.target : rel.source;
+          const otherChar = getCharById(otherId);
+          if (!otherChar) return;
+
+          // 角度配置：2人時左右對稱，多人時均勻環繞
+          let angle;
+          if (count === 1) {
+            angle = -Math.PI / 2;
+          } else if (count === 2) {
+            angle = idx === 0 ? Math.PI : 0;
+          } else {
+            angle = -Math.PI / 2 + (idx * 2 * Math.PI) / count;
+          }
+
+          const nx = cx + radius * Math.cos(angle);
+          const ny = cy + radius * Math.sin(angle);
+
+          // 繪製 SVG 鈍金連線
+          const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+          line.setAttribute('x1', cx);
+          line.setAttribute('y1', cy);
+          line.setAttribute('x2', nx);
+          line.setAttribute('y2', ny);
+          line.setAttribute('stroke', '#967249');
+          line.setAttribute('stroke-width', '1.5');
+          line.setAttribute('stroke-opacity', '0.65');
+          if (rel.type !== '血緣') {
+            line.setAttribute('stroke-dasharray', '4 3');
+          }
+          relationLinesSvgEl.appendChild(line);
+
+          // 線段中點放置「關係總稱」標籤
+          const midX = (cx + nx) / 2;
+          const midY = (cy + ny) / 2;
+          const edgeBadge = document.createElement('div');
+          edgeBadge.style.left = `${midX}px`;
+          edgeBadge.style.top = `${midY}px`;
+          edgeBadge.className = 'absolute -translate-x-1/2 -translate-y-1/2 z-10 px-2 py-0.5 bg-[#0B1013] border border-antiqueGold/70 text-antiqueGold text-[10px] sm:text-xs tracking-[0.15em] pl-[calc(0.5rem+0.15em)] whitespace-nowrap rounded-[2px] shadow-md pointer-events-none';
+          edgeBadge.textContent = rel.label;
+          relationNodesLayerEl.appendChild(edgeBadge);
+
+          // 繪製外圍關聯角色圓形頭像（點擊可切換為新中心）
+          const otherAvatarHtml = otherChar.avatar
+            ? `<img src="${otherChar.avatar}" alt="${otherChar.name}" class="w-full h-full object-cover rounded-full" />`
+            : `<span class="text-xs sm:text-sm font-bold tracking-[0.1em] text-washiText">${otherChar.name}</span>
+               <span class="font-sansJp text-[8px] sm:text-[9px] text-mutedGold mt-0.5">${otherChar.role}</span>`;
+
+          const otherNodeBtn = document.createElement('button');
+          otherNodeBtn.type = 'button';
+          otherNodeBtn.style.left = `${nx}px`;
+          otherNodeBtn.style.top = `${ny}px`;
+          otherNodeBtn.title = `點擊切換以「${otherChar.name}」為中心`;
+          otherNodeBtn.className = 'absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center z-20 cursor-pointer group focus:outline-none';
+          otherNodeBtn.innerHTML = `
+            <div class="node-circle w-[70px] h-[70px] sm:w-[84px] sm:h-[84px] rounded-full border border-dashed border-antiqueGold/80 group-hover:border-solid group-hover:border-antiqueGold flex flex-col items-center justify-center text-center px-1.5 overflow-hidden">
+              ${otherAvatarHtml}
+            </div>
+            <span class="mt-1 px-1.5 py-0.2 bg-[#0F1519] border border-antiqueGold/45 text-mutedGold group-hover:text-antiqueGold text-[9px] sm:text-[10px] tracking-[0.12em] rounded-[1px]">
+              ${otherChar.faction}
+            </span>
+          `;
+          otherNodeBtn.addEventListener('click', () => {
+            activeCharacterId = otherChar.id;
+            renderRelationChart();
+          });
+
+          relationNodesLayerEl.appendChild(otherNodeBtn);
+        });
+      }
+
+      // 渲染下方焦點人物檔案與雙向心態對照卡
+      function renderFocusDetailPanel() {
+        if (!focusDetailPanelEl) return;
+        const centerChar = getCharById(activeCharacterId);
+        if (!centerChar) return;
+
+        const connectedEdges = relationshipsData.filter(
+          (rel) => rel.source === centerChar.id || rel.target === centerChar.id
+        );
+
+        const relationCardsHtml = connectedEdges.map((rel) => {
+          const isSource = rel.source === centerChar.id;
+          const otherId = isSource ? rel.target : rel.source;
+          const otherChar = getCharById(otherId);
+          if (!otherChar) return '';
+
+          const centerToOtherNote = isSource ? rel.forwardNote : rel.reverseNote;
+          const otherToCenterNote = isSource ? rel.reverseNote : rel.forwardNote;
+
+          return `
+            <div class="border border-antiqueGold/35 bg-[#0F1519]/90 rounded-[2px] p-4 sm:p-5">
+              <div class="flex flex-wrap items-center justify-between gap-2 pb-3 mb-3 border-b border-antiqueGold/20">
+                <div class="flex items-center gap-2">
+                  <span class="text-sm sm:text-base font-bold text-washiText tracking-[0.15em]">
+                    ${otherChar.name}
+                  </span>
+                  <span class="font-sansJp text-[10px] px-2 py-0.5 border border-antiqueGold/40 text-mutedGold">
+                    ${otherChar.faction}・${otherChar.role}
+                  </span>
+                </div>
+                <span class="px-2.5 py-0.5 bg-antiqueGold/15 border border-antiqueGold/60 text-antiqueGold text-xs font-semibold tracking-[0.18em] pl-[calc(0.625rem+0.18em)]">
+                  總稱：${rel.label}
+                </span>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm">
+                <!-- 中心人物對關聯人物的心態/台詞 -->
+                <div class="bg-[#0B1013] border-l-2 border-antiqueGold px-3.5 py-2.5">
+                  <div class="font-sansJp text-[11px] text-mutedGold mb-1">
+                    ${centerChar.name} <span class="text-antiqueGold mx-1">→</span> ${otherChar.name}
+                  </div>
+                  <p class="text-washiText font-medium tracking-[0.08em]">
+                    ${centerToOtherNote ? `「${centerToOtherNote}」` : '—'}
+                  </p>
+                </div>
+
+                <!-- 關聯人物對中心人物的心態/台詞 -->
+                <div class="bg-[#0B1013] border-l-2 border-antiqueGold/50 px-3.5 py-2.5">
+                  <div class="font-sansJp text-[11px] text-mutedGold mb-1">
+                    ${otherChar.name} <span class="text-antiqueGold mx-1">→</span> ${centerChar.name}
+                  </div>
+                  <p class="text-washiText font-medium tracking-[0.08em]">
+                    ${otherToCenterNote ? `「${otherToCenterNote}」` : '—'}
+                  </p>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        focusDetailPanelEl.innerHTML = `
+          <!-- 焦點角色基本資料頭 -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 mb-5 border-b border-antiqueGold/30">
+            <div>
+              <div class="flex flex-wrap items-center gap-2.5 mb-1.5">
+                <h3 class="text-lg sm:text-xl font-bold tracking-[0.25em] text-antiqueGold">
+                  ${centerChar.name}
+                </h3>
+                <span class="px-2 py-0.5 bg-antiqueGold text-[#0B1013] text-[11px] font-bold tracking-[0.18em] pl-[calc(0.5rem+0.18em)]">
+                  ${centerChar.faction}
+                </span>
+                <span class="px-2 py-0.5 border border-antiqueGold/55 text-antiqueGold text-[11px] tracking-[0.15em]">
+                  ${centerChar.role}
+                </span>
+              </div>
+              <p class="font-sansJp text-xs sm:text-sm text-washiText/85 leading-relaxed">
+                ${centerChar.bio}
+              </p>
+            </div>
+          </div>
+
+          <!-- 雙向關係心態一覽 -->
+          <div>
+            <h4 class="text-xs tracking-[0.28em] text-antiqueGold/90 mb-3 flex items-center gap-2">
+              <span class="w-1.5 h-1.5 rotate-45 bg-antiqueGold"></span>
+              關聯人物與雙向心態對照
+            </h4>
+            <div class="space-y-3">
+              ${relationCardsHtml || '<p class="font-sansJp text-xs text-mutedGold">暫無已登錄之關係連線</p>'}
+            </div>
+          </div>
+        `;
+      }
+
+      function renderRelationChart() {
+        renderCharacterRoster();
+        renderFocusGraph();
+        renderFocusDetailPanel();
+      }
+
+      // 陣營篩選按鈕綁定
+      factionBtns.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          activeFactionFilter = btn.dataset.faction;
+          factionBtns.forEach((b) => {
+            if (b === btn) {
+              b.classList.remove('bg-[#0B1013]', 'text-antiqueGold', 'border-antiqueGold/45');
+              b.classList.add('bg-antiqueGold', 'text-[#0B1013]', 'font-bold', 'border-antiqueGold');
+            } else {
+              b.classList.remove('bg-antiqueGold', 'text-[#0B1013]', 'font-bold', 'border-antiqueGold');
+              b.classList.add('bg-[#0B1013]', 'text-antiqueGold', 'border-antiqueGold/45');
+            }
+          });
+          renderCharacterRoster();
+        });
+      });
+
+      // 視窗縮放時重新計算 SVG 連線座標
+      window.addEventListener('resize', () => {
+        if (!pageContent.classList.contains('hidden')) {
+          renderFocusGraph();
+        }
+      });
+
+      // 初始預先渲染一次資料
+      renderRelationChart();
     });
   </script>
 </body>
