@@ -780,7 +780,18 @@
           fullBodyUrl: './eighthead0101.png',
           bio: '關東極道八幡組組長八幡龍司的外孫女，總是臭著一張臉，看起來有些難以接近的樣子。似乎不太擅長表達情緒，對極道中人嚴肅且冷硬，但對非極道人士倒是溫柔卻疏離。在8歲時回到八幡組本家由外祖父龍司扶養，回到本家之後被組裡的這些叔叔哥哥當做妹妹、女兒甚至孫女一樣照顧。\n\n因為龍司主導她的婚事，為了掌握主動權而加入了少當家的競爭。目前最主要的對手是同組的嶽釜久遠，跟對方相當合不來。\n\n從小就擅長打架，也制霸了周圍的學校小混混成為隱藏的共主，雖然善於動手但似乎有天生的領袖魅力，匯聚了各式各樣的人在她身邊。'
         },
-        { id: 'kazuki', name: '小泉 一樹', shortName: '一樹', role: '一般組員', avatarUrl: './IZUMI01.png', isPreCircled: true, age: '未填寫', height: '未填寫', fullBodyUrl: './izumiii.png', bio: '（此處預留「小泉 一樹」的完整角色介紹。）' },
+        {
+          id: 'kazuki',
+          name: '小泉 一樹',
+          shortName: '一樹',
+          role: '一般組員',
+          avatarUrl: './IZUMI01.png',
+          isPreCircled: true,
+          age: '28歲',
+          height: '178公分',
+          fullBodyUrl: './izumiii.png',
+          bio: '前警察，檢舉瀆職事件後差點遭上司滅口心灰意冷，自警察辭職轉而跟隨當時出手幫助他的凪。\n\n沈默寡言但忠誠，雖然人情應對上稱得上遲鈍但戰鬥上有野獸般的直覺，徒手搏鬥技術強，身體強壯。凪最得力的部下，稱呼她為大姐頭；同時也是第一個自己收下的部下，兩人有相當強的信賴關係。'
+        },
         { id: 'kana', name: '穎川 歌那', shortName: '歌那', role: '外部勢力', avatarUrl: './kana.png', isPreCircled: true, age: '未填寫', height: '未填寫', fullBodyUrl: './1125-2.png', bio: '（此處預留「穎川 歌那」的完整角色介紹。）' },
         { id: 'gen', name: '宇佐 玄', shortName: '玄', role: '外部勢力', avatarUrl: './GENN.png', isPreCircled: true, age: '未填寫', height: '未填寫', fullBodyUrl: './1122.png', bio: '（此處預留「宇佐 玄」的完整角色介紹。）' },
         { id: 'ryuji', name: '八幡 龍司', shortName: '龍司', role: '組長', avatarUrl: './eighthead02.png', isPreCircled: true, age: '未填寫', height: '未填寫', fullBodyUrl: './jiji.png', bio: '（此處預留「八幡 龍司」的完整角色介紹。）' },
@@ -796,7 +807,10 @@
 
       var relationships = [
         { source: 'ryuji', target: 'nagi', label: '祖孫', bidirectional: true },
-        { source: 'koubai', target: 'byakushi', label: '祖孫', bidirectional: true }
+        { source: 'koubai', target: 'byakushi', label: '祖孫', bidirectional: true },
+        { source: 'kazuki', target: 'nagi', label: '信賴關係', bidirectional: true },
+        { source: 'kazuki', target: 'tsubasa', label: '棋逢對手', bidirectional: true },
+        { source: 'kazuki', target: 'kuon', label: '', bidirectional: true }
       ];
 
       var activeCenterId = 'nagi';
@@ -908,10 +922,24 @@
         relationships.forEach(function (rel) {
           if (rel.source === centerId) {
             var peerA = getCharacterById(rel.target);
-            if (peerA) peers.push({ character: peerA, label: rel.label, bidirectional: rel.bidirectional });
+            if (peerA) {
+              peers.push({
+                character: peerA,
+                label: rel.label,
+                reverseLabel: rel.reverseLabel || '',
+                bidirectional: rel.bidirectional
+              });
+            }
           } else if (rel.target === centerId) {
             var peerB = getCharacterById(rel.source);
-            if (peerB) peers.push({ character: peerB, label: rel.label, bidirectional: rel.bidirectional });
+            if (peerB) {
+              peers.push({
+                character: peerB,
+                label: rel.reverseLabel || rel.label,
+                reverseLabel: rel.reverseLabel ? rel.label : '',
+                bidirectional: rel.bidirectional
+              });
+            }
           }
         });
         return peers;
@@ -1031,15 +1059,17 @@
           line.setAttribute('stroke-opacity', '0.85');
           linesSvg.appendChild(line);
 
-          var midX = (cx + px) / 2;
-          var midY = (cy + py) / 2;
-          var labelEl = document.createElement('div');
-          labelEl.style.left = midX + '%';
-          labelEl.style.top = midY + '%';
-          labelEl.className =
-            'absolute -translate-x-1/2 -translate-y-1/2 z-30 px-3 py-0.5 text-[11px] sm:text-xs tracking-[0.22em] text-gold bg-ink border border-gold/70 rounded-full shadow-lg whitespace-nowrap pointer-events-none';
-          labelEl.textContent = item.bidirectional ? '⇄ ' + item.label : item.label;
-          nodesLayer.appendChild(labelEl);
+          if (item.label) {
+            var midX = (cx + px) / 2;
+            var midY = (cy + py) / 2;
+            var labelEl = document.createElement('div');
+            labelEl.style.left = midX + '%';
+            labelEl.style.top = midY + '%';
+            labelEl.className =
+              'absolute -translate-x-1/2 -translate-y-1/2 z-30 px-3 py-0.5 text-[11px] sm:text-xs tracking-[0.22em] text-gold bg-ink border border-gold/70 rounded-full shadow-lg whitespace-nowrap pointer-events-none';
+            labelEl.textContent = item.bidirectional ? '⇄ ' + item.label : item.label;
+            nodesLayer.appendChild(labelEl);
+          }
 
           var peerBtn = document.createElement('button');
           peerBtn.type = 'button';
