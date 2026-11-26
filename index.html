@@ -505,3 +505,363 @@
           candidateIndex += 1;
           if (candidateIndex < candidatePaths.length) {
             emblemImg.src = candidatePaths[candidateIndex];
+          } else {
+            emblemImg.classList.add('hidden');
+            if (emblemErrorHint) emblemErrorHint.classList.remove('hidden');
+          }
+        });
+      }
+
+      const shojiLeft = document.getElementById('shoji-left');
+      const shojiRight = document.getElementById('shoji-right');
+      const replayShojiBtn = document.getElementById('replay-shoji-btn');
+      let shojiTimer = null;
+
+      function openShojiDoors(delay = 350) {
+        clearTimeout(shojiTimer);
+        shojiTimer = setTimeout(() => {
+          shojiLeft.classList.add('shoji-open-left');
+          shojiRight.classList.add('shoji-open-right');
+        }, delay);
+      }
+
+      function replayShojiDoors() {
+        clearTimeout(shojiTimer);
+        shojiLeft.classList.remove('shoji-open-left');
+        shojiRight.classList.remove('shoji-open-right');
+        void shojiLeft.offsetWidth;
+        openShojiDoors(650);
+      }
+
+      openShojiDoors(400);
+
+      if (replayShojiBtn) {
+        replayShojiBtn.addEventListener('click', replayShojiDoors);
+      }
+
+      const heroSlideshow = document.getElementById('hero-slideshow');
+      const slideItems = document.querySelectorAll('.slide-item');
+      const slideDots = document.querySelectorAll('.slide-dot');
+      let currentSlide = 0;
+      let slideInterval = null;
+      let touchStartX = 0;
+
+      function showSlide(index) {
+        const total = slideItems.length;
+        currentSlide = (index + total) % total;
+
+        slideItems.forEach((slide, idx) => {
+          if (idx === currentSlide) {
+            slide.classList.remove('slide-inactive');
+            slide.classList.add('slide-active');
+          } else {
+            slide.classList.remove('slide-active');
+            slide.classList.add('slide-inactive');
+          }
+        });
+
+        slideDots.forEach((dot, idx) => {
+          if (idx === currentSlide) {
+            dot.classList.remove('bg-gold/30');
+            dot.classList.add('bg-gold');
+          } else {
+            dot.classList.remove('bg-gold');
+            dot.classList.add('bg-gold/30');
+          }
+        });
+      }
+
+      function startAutoSlide() {
+        clearInterval(slideInterval);
+        slideInterval = setInterval(() => {
+          showSlide(currentSlide + 1);
+        }, 5000);
+      }
+
+      slideDots.forEach((dot) => {
+        dot.addEventListener('click', () => {
+          const targetIdx = parseInt(dot.getAttribute('data-index'), 10);
+          showSlide(targetIdx);
+          startAutoSlide();
+        });
+      });
+
+      if (heroSlideshow) {
+        heroSlideshow.addEventListener('touchstart', (e) => {
+          touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        heroSlideshow.addEventListener('touchend', (e) => {
+          const touchEndX = e.changedTouches[0].screenX;
+          const diffX = touchEndX - touchStartX;
+          if (Math.abs(diffX) > 40) {
+            if (diffX < 0) {
+              showSlide(currentSlide + 1);
+            } else {
+              showSlide(currentSlide - 1);
+            }
+            startAutoSlide();
+          }
+        }, { passive: true });
+      }
+
+      startAutoSlide();
+
+      const pageHome = document.getElementById('page-home');
+      const pageContent = document.getElementById('page-content');
+      const pageCurtain = document.getElementById('page-curtain');
+      const enterArchiveBtn = document.getElementById('enter-archive-btn');
+      const goHomeButtons = document.querySelectorAll('[data-go-home]');
+      let isTransitioning = false;
+
+      function switchPageWithCurtain(targetPage) {
+        if (isTransitioning) return;
+        isTransitioning = true;
+
+        pageCurtain.classList.remove('pointer-events-none', 'opacity-0');
+        pageCurtain.classList.add('pointer-events-auto', 'opacity-100');
+
+        setTimeout(() => {
+          if (targetPage === 'content') {
+            pageHome.classList.add('hidden');
+            replayShojiBtn.classList.add('hidden');
+            pageContent.classList.remove('hidden');
+            renderRelationStage();
+          } else {
+            pageContent.classList.add('hidden');
+            pageHome.classList.remove('hidden');
+            replayShojiBtn.classList.remove('hidden');
+          }
+
+          window.scrollTo({ top: 0, behavior: 'instant' });
+
+          requestAnimationFrame(() => {
+            pageCurtain.classList.remove('opacity-100');
+            pageCurtain.classList.add('opacity-0');
+
+            setTimeout(() => {
+              pageCurtain.classList.remove('pointer-events-auto');
+              pageCurtain.classList.add('pointer-events-none');
+              isTransitioning = false;
+            }, 560);
+          });
+        }, 560);
+      }
+
+      if (enterArchiveBtn) {
+        enterArchiveBtn.addEventListener('click', () => switchPageWithCurtain('content'));
+      }
+
+      goHomeButtons.forEach((btn) => {
+        btn.addEventListener('click', () => switchPageWithCurtain('home'));
+      });
+
+      /* =====================================================================
+         D. 人物關關係圖資料與互動邏輯
+         在各角色的 avatarUrl 填入圖檔路徑（例如 './nagi.png'）即可顯示人臉
+         ===================================================================== */
+      const characters = [
+        { id: 'nagi', name: '八幡 凪', shortName: '凪', role: '少當家候補', avatarUrl: '' },
+        { id: 'kazuki', name: '小泉 一樹', shortName: '一樹', role: '一般組員', avatarUrl: '' },
+        { id: 'kana', name: '穎川 歌那', shortName: '歌那', role: '外部勢力', avatarUrl: '' },
+        { id: 'gen', name: '宇佐 玄', shortName: '玄', role: '外部勢力', avatarUrl: '' },
+        { id: 'ryuji', name: '八幡 龍司', shortName: '龍司', role: '組長', avatarUrl: '' },
+        { id: 'koubai', name: '應 紅梅', shortName: '紅梅', role: '幹部', avatarUrl: '' },
+        { id: 'byakushi', name: '應 白芷', shortName: '白芷', role: '外部勢力', avatarUrl: '' },
+        { id: 'lin', name: '林', shortName: '林', role: '外部勢力', avatarUrl: '' },
+        { id: 'kuon', name: '嶽釜 久遠', shortName: '久遠', role: '少當家候補', avatarUrl: '' },
+        { id: 'rui', name: '若色 累', shortName: '累', role: '前幹部', avatarUrl: '' },
+        { id: 'mimiko', name: '佐野 美美子', shortName: '美美子', role: '外部勢力', avatarUrl: '' },
+        { id: 'tsubasa', name: '鷲井 翼', shortName: '翼', role: '外部勢力', avatarUrl: '' },
+        { id: 'subaru', name: '布施谷 昴', shortName: '昴', role: '一般組員', avatarUrl: '' }
+      ];
+
+      const relationships = [
+        { source: 'ryuji', target: 'nagi', label: '祖孫', bidirectional: true },
+        { source: 'koubai', target: 'byakushi', label: '祖孫', bidirectional: true }
+      ];
+
+      let activeCenterId = 'nagi';
+
+      const linesSvg = document.getElementById('relation-lines-svg');
+      const nodesLayer = document.getElementById('relation-nodes-layer');
+      const avatarLinksContainer = document.getElementById('characterAvatarLinks');
+
+      function getCharacterById(id) {
+        return characters.find((c) => c.id === id);
+      }
+
+      function getConnectedPeers(centerId) {
+        const peers = [];
+        relationships.forEach((rel) => {
+          if (rel.source === centerId) {
+            const peer = getCharacterById(rel.target);
+            if (peer) peers.push({ character: peer, label: rel.label, bidirectional: rel.bidirectional });
+          } else if (rel.target === centerId) {
+            const peer = getCharacterById(rel.source);
+            if (peer) peers.push({ character: peer, label: rel.label, bidirectional: rel.bidirectional });
+          }
+        });
+        return peers;
+      }
+
+      function renderBubbleInner(char, isCenter) {
+        if (char.avatarUrl) {
+          return `
+            <img src="${char.avatarUrl}" alt="${char.name}" class="w-full h-full object-cover object-top" />
+            <div class="absolute inset-x-0 bottom-0 pt-4 pb-1.5 px-1 bg-gradient-to-t from-ink/95 via-ink/75 to-transparent flex flex-col items-center justify-end">
+              <span class="text-[8px] sm:text-[9px] tracking-[0.1em] text-gold/90 leading-none mb-0.5 truncate max-w-full">${char.role}</span>
+              <span class="${isCenter ? 'text-xs sm:text-sm font-semibold text-[#F5F1E8]' : 'text-[10px] sm:text-xs font-medium text-[#E5E0D8]'} tracking-[0.1em] leading-tight truncate max-w-full">${char.shortName}</span>
+            </div>
+          `;
+        }
+        return `
+          <span class="text-[9px] sm:text-[10px] tracking-[0.12em] text-gold/80 mb-0.5 truncate max-w-full">${char.role}</span>
+          <span class="${isCenter ? 'text-sm sm:text-base font-semibold text-[#F5F1E8]' : 'text-xs sm:text-sm font-medium text-[#F0ECE3] group-hover:text-gold'} tracking-[0.12em] transition-colors leading-tight">${char.name}</span>
+        `;
+      }
+
+      function renderRelationStage() {
+        if (!linesSvg || !nodesLayer) return;
+
+        const centerChar = getCharacterById(activeCenterId) || characters[0];
+        const connectedPeers = getConnectedPeers(centerChar.id);
+
+        linesSvg.innerHTML = '';
+        nodesLayer.innerHTML = '';
+
+        const cx = 50;
+        const cy = connectedPeers.length > 0 ? 63 : 46;
+        const totalPeers = connectedPeers.length;
+
+        connectedPeers.forEach((item, index) => {
+          let angleRad;
+          if (totalPeers === 1) {
+            angleRad = -Math.PI / 2;
+          } else {
+            angleRad = -Math.PI / 2 + (index * 2 * Math.PI) / totalPeers;
+          }
+
+          const radiusX = totalPeers === 1 ? 0 : 28;
+          const radiusY = totalPeers === 1 ? 37 : 31;
+
+          const px = cx + radiusX * Math.cos(angleRad);
+          const py = cy + radiusY * Math.sin(angleRad);
+
+          const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+          line.setAttribute('x1', cx);
+          line.setAttribute('y1', cy);
+          line.setAttribute('x2', px);
+          line.setAttribute('y2', py);
+          line.setAttribute('stroke', '#967249');
+          line.setAttribute('stroke-width', '0.55');
+          line.setAttribute('stroke-opacity', '0.85');
+          linesSvg.appendChild(line);
+
+          const midX = (cx + px) / 2;
+          const midY = (cy + py) / 2;
+          const labelEl = document.createElement('div');
+          labelEl.style.left = `${midX}%`;
+          labelEl.style.top = `${midY}%`;
+          labelEl.className =
+            'absolute -translate-x-1/2 -translate-y-1/2 z-30 px-3 py-0.5 text-[11px] sm:text-xs tracking-[0.22em] text-gold bg-ink border border-gold/70 rounded-full shadow-lg whitespace-nowrap pointer-events-none';
+          labelEl.textContent = item.bidirectional ? `⇄ ${item.label}` : item.label;
+          nodesLayer.appendChild(labelEl);
+
+          const peerBtn = document.createElement('button');
+          peerBtn.type = 'button';
+          peerBtn.style.left = `${px}%`;
+          peerBtn.style.top = `${py}%`;
+          peerBtn.setAttribute('aria-label', `切換焦點至 ${item.character.name}`);
+          peerBtn.className =
+            'bubble-node absolute -translate-x-1/2 -translate-y-1/2 z-20 w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden bg-ink-light/95 border border-gold/60 hover:border-gold flex flex-col items-center justify-center p-1.5 text-center shadow-lg cursor-pointer group';
+
+          peerBtn.innerHTML = renderBubbleInner(item.character, false);
+          peerBtn.addEventListener('click', () => {
+            setActiveCenter(item.character.id);
+          });
+
+          nodesLayer.appendChild(peerBtn);
+        });
+
+        const centerNode = document.createElement('div');
+        centerNode.style.left = `${cx}%`;
+        centerNode.style.top = `${cy}%`;
+        centerNode.className =
+          'bubble-center absolute -translate-x-1/2 -translate-y-1/2 z-20 w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden bg-ink border-2 border-gold flex flex-col items-center justify-center p-2 text-center relative';
+
+        centerNode.innerHTML = renderBubbleInner(centerChar, true);
+        nodesLayer.appendChild(centerNode);
+
+        if (connectedPeers.length === 0) {
+          const emptyHint = document.createElement('div');
+          emptyHint.style.left = '50%';
+          emptyHint.style.top = '74%';
+          emptyHint.className =
+            'absolute -translate-x-1/2 -translate-y-1/2 z-20 px-3.5 py-1 text-[11px] sm:text-xs tracking-[0.25em] text-[#8E877D] border border-gold/20 rounded-full bg-ink/80 whitespace-nowrap';
+          emptyHint.textContent = '関係線未登録';
+          nodesLayer.appendChild(emptyHint);
+        }
+      }
+
+      function renderAvatarLinks() {
+        if (!avatarLinksContainer) return;
+        avatarLinksContainer.innerHTML = '';
+
+        characters.forEach((char) => {
+          const isCenter = char.id === activeCenterId;
+
+          const itemWrapper = document.createElement('div');
+          itemWrapper.setAttribute('role', 'listitem');
+          itemWrapper.className = 'flex flex-col items-center w-full max-w-[96px]';
+
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.setAttribute('aria-label', `檢視 ${char.name} 的關係網`);
+          btn.className = `w-14 h-14 sm:w-16 sm:h-16 rounded-full border ${
+            isCenter ? 'avatar-btn-active border-gold' : 'border-gold/35 hover:border-gold/80 bg-ink'
+          } flex items-center justify-center overflow-hidden transition-all duration-300 cursor-pointer mb-2 relative group`;
+
+          if (char.avatarUrl) {
+            btn.innerHTML = `<img src="${char.avatarUrl}" alt="${char.name}" class="w-full h-full object-cover object-top" />`;
+          } else {
+            btn.innerHTML = `
+              <span class="text-xs sm:text-sm font-medium tracking-widest ${
+                isCenter ? 'text-gold' : 'text-[#C8C0B4] group-hover:text-gold'
+              } transition-colors">${char.shortName}</span>
+            `;
+          }
+
+          btn.addEventListener('click', () => {
+            setActiveCenter(char.id);
+          });
+
+          const nameLabel = document.createElement('span');
+          nameLabel.className = `text-[11px] sm:text-xs tracking-[0.08em] text-center leading-snug ${
+            isCenter ? 'text-gold font-medium' : 'text-[#E0D9CE]'
+          }`;
+          nameLabel.textContent = char.name;
+
+          const roleLabel = document.createElement('span');
+          roleLabel.className = 'text-[9px] sm:text-[10px] tracking-[0.06em] text-[#8E877D] text-center mt-0.5 leading-tight';
+          roleLabel.textContent = char.role;
+
+          itemWrapper.appendChild(btn);
+          itemWrapper.appendChild(nameLabel);
+          itemWrapper.appendChild(roleLabel);
+          avatarLinksContainer.appendChild(itemWrapper);
+        });
+      }
+
+      function setActiveCenter(characterId) {
+        activeCenterId = characterId;
+        renderRelationStage();
+        renderAvatarLinks();
+      }
+
+      renderRelationStage();
+      renderAvatarLinks();
+    });
+  </script>
+</body>
+</html>
