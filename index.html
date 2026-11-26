@@ -5,12 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>八幡組｜YAHATA-GUMI ARCHIVES</title>
 
-  <!-- Google Fonts: Noto Serif JP & Noto Serif TC -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500;600;700&family=Noto+Serif+TC:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -354,7 +352,6 @@
       </div>
     </div>
 
-    <!-- 區塊一：八幡組綱領 -->
     <section id="section-creed" class="scroll-mt-20 max-w-3xl mx-auto px-4 sm:px-6 mb-14 sm:mb-20">
       <div class="border border-gold/45 p-1.5 sm:p-2 rounded bg-ink-card/80 shadow-[0_10px_30px_rgba(0,0,0,0.45)]">
         <div class="relative border border-gold/30 px-5 py-4 sm:px-10 sm:py-5 rounded-sm flex flex-col items-center justify-center text-center">
@@ -374,7 +371,6 @@
       </div>
     </section>
 
-    <!-- 區塊二：沿革・大事紀 -->
     <section id="section-history" class="scroll-mt-20 max-w-4xl mx-auto px-4 sm:px-6 mb-16 sm:mb-24">
       <div class="text-center mb-10 sm:mb-14">
         <p class="text-[10px] sm:text-xs tracking-[0.4em] text-gold/75 uppercase mb-1.5">CHRONICLE</p>
@@ -440,7 +436,6 @@
       </div>
     </section>
 
-    <!-- 區塊三：人物關關係圖 -->
     <section id="section-relations" class="scroll-mt-20 max-w-4xl mx-auto px-4 sm:px-6">
       <div class="text-center mb-8 sm:mb-10">
         <p class="text-[10px] sm:text-xs tracking-[0.4em] text-gold/75 uppercase mb-1.5">RELATIONSHIP MAP</p>
@@ -492,35 +487,40 @@
 
   </div>
 
-  <!-- 1. 獨立優先執行紙門開閉，不受其他腳本影響 -->
+  <!-- 1. 障子門自動開啟與保底 -->
   <script>
     (function () {
-      let shojiTimer = null;
-      function openShojiDoors(delay) {
-        const left = document.getElementById('shoji-left');
-        const right = document.getElementById('shoji-right');
-        if (!left || !right) return;
+      var shojiTimer = null;
+
+      function triggerOpenShoji() {
+        var left = document.getElementById('shoji-left');
+        var right = document.getElementById('shoji-right');
+        if (left) left.classList.add('shoji-open-left');
+        if (right) right.classList.add('shoji-open-right');
+      }
+
+      function scheduleOpenShoji(delay) {
         clearTimeout(shojiTimer);
-        shojiTimer = setTimeout(function () {
-          left.classList.add('shoji-open-left');
-          right.classList.add('shoji-open-right');
-        }, delay || 400);
+        shojiTimer = setTimeout(triggerOpenShoji, delay || 400);
       }
 
       function replayShojiDoors() {
-        const left = document.getElementById('shoji-left');
-        const right = document.getElementById('shoji-right');
+        var left = document.getElementById('shoji-left');
+        var right = document.getElementById('shoji-right');
         if (!left || !right) return;
         clearTimeout(shojiTimer);
         left.classList.remove('shoji-open-left');
         right.classList.remove('shoji-open-right');
         void left.offsetWidth;
-        openShojiDoors(650);
+        scheduleOpenShoji(650);
       }
 
-      window.addEventListener('DOMContentLoaded', function () {
-        openShojiDoors(400);
-        const btn = document.getElementById('replay-shoji-btn');
+      scheduleOpenShoji(450);
+      setTimeout(triggerOpenShoji, 1500);
+
+      document.addEventListener('DOMContentLoaded', function () {
+        scheduleOpenShoji(450);
+        var btn = document.getElementById('replay-shoji-btn');
         if (btn) {
           btn.addEventListener('click', replayShojiDoors);
         }
@@ -530,12 +530,12 @@
 
   <!-- 2. 主互動邏輯 -->
   <script>
-    window.addEventListener('DOMContentLoaded', function () {
-      const emblemImg = document.getElementById('emblem-img');
-      const emblemErrorHint = document.getElementById('emblem-error-hint');
+    document.addEventListener('DOMContentLoaded', function () {
+      var emblemImg = document.getElementById('emblem-img');
+      var emblemErrorHint = document.getElementById('emblem-error-hint');
       if (emblemImg) {
-        const candidatePaths = ['./dai.png', './dai.PNG', './DAI.png', './DAI.PNG', './dai.jpg', './dai.JPG'];
-        let candidateIndex = 0;
+        var candidatePaths = ['./dai.png', './dai.PNG', './DAI.png', './DAI.PNG', './dai.jpg', './dai.JPG'];
+        var candidateIndex = 0;
         emblemImg.addEventListener('error', function () {
           candidateIndex += 1;
           if (candidateIndex < candidatePaths.length) {
@@ -547,15 +547,15 @@
         });
       }
 
-      const heroSlideshow = document.getElementById('hero-slideshow');
-      const slideItems = document.querySelectorAll('.slide-item');
-      const slideDots = document.querySelectorAll('.slide-dot');
-      let currentSlide = 0;
-      let slideInterval = null;
-      let touchStartX = 0;
+      var heroSlideshow = document.getElementById('hero-slideshow');
+      var slideItems = document.querySelectorAll('.slide-item');
+      var slideDots = document.querySelectorAll('.slide-dot');
+      var currentSlide = 0;
+      var slideInterval = null;
+      var touchStartX = 0;
 
       function showSlide(index) {
-        const total = slideItems.length;
+        var total = slideItems.length;
         if (!total) return;
         currentSlide = (index + total) % total;
 
@@ -589,7 +589,7 @@
 
       slideDots.forEach(function (dot) {
         dot.addEventListener('click', function () {
-          const targetIdx = parseInt(dot.getAttribute('data-index'), 10);
+          var targetIdx = parseInt(dot.getAttribute('data-index'), 10);
           showSlide(targetIdx);
           startAutoSlide();
         });
@@ -601,8 +601,8 @@
         }, { passive: true });
 
         heroSlideshow.addEventListener('touchend', function (e) {
-          const touchEndX = e.changedTouches[0].screenX;
-          const diffX = touchEndX - touchStartX;
+          var touchEndX = e.changedTouches[0].screenX;
+          var diffX = touchEndX - touchStartX;
           if (Math.abs(diffX) > 40) {
             if (diffX < 0) {
               showSlide(currentSlide + 1);
@@ -616,13 +616,13 @@
 
       startAutoSlide();
 
-      const pageHome = document.getElementById('page-home');
-      const pageContent = document.getElementById('page-content');
-      const pageCurtain = document.getElementById('page-curtain');
-      const enterArchiveBtn = document.getElementById('enter-archive-btn');
-      const replayShojiBtn = document.getElementById('replay-shoji-btn');
-      const goHomeButtons = document.querySelectorAll('[data-go-home]');
-      let isTransitioning = false;
+      var pageHome = document.getElementById('page-home');
+      var pageContent = document.getElementById('page-content');
+      var pageCurtain = document.getElementById('page-curtain');
+      var enterArchiveBtn = document.getElementById('enter-archive-btn');
+      var replayShojiBtn = document.getElementById('replay-shoji-btn');
+      var goHomeButtons = document.querySelectorAll('[data-go-home]');
+      var isTransitioning = false;
 
       function switchPageWithCurtain(targetPage) {
         if (isTransitioning || !pageCurtain) return;
@@ -670,7 +670,7 @@
         });
       });
 
-      const characters = [
+      var characters = [
         { id: 'nagi', name: '八幡 凪', shortName: '凪', role: '少當家候補', avatarUrl: './eighthead01.png', isPreCircled: true },
         { id: 'kazuki', name: '小泉 一樹', shortName: '一樹', role: '一般組員', avatarUrl: '', isPreCircled: false },
         { id: 'kana', name: '穎川 歌那', shortName: '歌那', role: '外部勢力', avatarUrl: '', isPreCircled: false },
@@ -686,16 +686,16 @@
         { id: 'subaru', name: '布施谷 昴', shortName: '昴', role: '一般組員', avatarUrl: '', isPreCircled: false }
       ];
 
-      const relationships = [
+      var relationships = [
         { source: 'ryuji', target: 'nagi', label: '祖孫', bidirectional: true },
         { source: 'koubai', target: 'byakushi', label: '祖孫', bidirectional: true }
       ];
 
-      let activeCenterId = 'nagi';
+      var activeCenterId = 'nagi';
 
-      const linesSvg = document.getElementById('relation-lines-svg');
-      const nodesLayer = document.getElementById('relation-nodes-layer');
-      const avatarLinksContainer = document.getElementById('characterAvatarLinks');
+      var linesSvg = document.getElementById('relation-lines-svg');
+      var nodesLayer = document.getElementById('relation-nodes-layer');
+      var avatarLinksContainer = document.getElementById('characterAvatarLinks');
 
       function getCharacterById(id) {
         return characters.find(function (c) {
@@ -704,68 +704,80 @@
       }
 
       function getConnectedPeers(centerId) {
-        const peers = [];
+        var peers = [];
         relationships.forEach(function (rel) {
           if (rel.source === centerId) {
-            const peer = getCharacterById(rel.target);
-            if (peer) peers.push({ character: peer, label: rel.label, bidirectional: rel.bidirectional });
+            var peerA = getCharacterById(rel.target);
+            if (peerA) peers.push({ character: peerA, label: rel.label, bidirectional: rel.bidirectional });
           } else if (rel.target === centerId) {
-            const peer = getCharacterById(rel.source);
-            if (peer) peers.push({ character: peer, label: rel.label, bidirectional: rel.bidirectional });
+            var peerB = getCharacterById(rel.source);
+            if (peerB) peers.push({ character: peerB, label: rel.label, bidirectional: rel.bidirectional });
           }
         });
         return peers;
       }
 
-      function renderBubbleInner(char, isCenter) {
-        if (char.avatarUrl) {
-          if (char.isPreCircled) {
-            return '<img src="' + char.avatarUrl + '" alt="' + char.name + '" class="w-full h-full object-contain p-0.5" />';
-          }
-          const nameCls = isCenter ? 'text-xs sm:text-sm font-semibold text-[#F5F1E8]' : 'text-[10px] sm:text-xs font-medium text-[#E5E0D8]';
-          return (
-            '<img src="' + char.avatarUrl + '" alt="' + char.name + '" class="w-full h-full object-cover object-top" />' +
-            '<div class="absolute inset-x-0 bottom-0 pt-4 pb-1.5 px-1 bg-gradient-to-t from-ink/95 via-ink/75 to-transparent flex flex-col items-center justify-end">' +
-              '<span class="text-[8px] sm:text-[9px] tracking-[0.1em] text-gold/90 leading-none mb-0.5 truncate max-w-full">' + char.role + '</span>' +
-              '<span class="' + nameCls + ' tracking-[0.1em] leading-tight truncate max-w-full">' + char.shortName + '</span>' +
-            '</div>'
-          );
-        }
-        const nameCls = isCenter ? 'text-sm sm:text-base font-semibold text-[#F5F1E8]' : 'text-xs sm:text-sm font-medium text-[#F0ECE3] group-hover:text-gold';
+      function renderFallbackText(char, isCenter) {
+        var nameCls = isCenter
+          ? 'text-sm sm:text-base font-semibold text-[#F5F1E8]'
+          : 'text-xs sm:text-sm font-medium text-[#F0ECE3] group-hover:text-gold';
         return (
           '<span class="text-[9px] sm:text-[10px] tracking-[0.12em] text-gold/80 mb-0.5 truncate max-w-full">' + char.role + '</span>' +
           '<span class="' + nameCls + ' tracking-[0.12em] transition-colors leading-tight">' + char.name + '</span>'
         );
       }
 
+      function renderBubbleInner(char, isCenter) {
+        if (!char.avatarUrl) {
+          return renderFallbackText(char, isCenter);
+        }
+        if (char.isPreCircled) {
+          return (
+            '<img src="' + char.avatarUrl + '" alt="' + char.name + '" class="w-full h-full object-contain p-0.5" onerror="this.parentElement.innerHTML = \'' +
+            renderFallbackText(char, isCenter).replace(/'/g, "\\'") +
+            '\'" />'
+          );
+        }
+        var nameCls = isCenter ? 'text-xs sm:text-sm font-semibold text-[#F5F1E8]' : 'text-[10px] sm:text-xs font-medium text-[#E5E0D8]';
+        return (
+          '<img src="' + char.avatarUrl + '" alt="' + char.name + '" class="w-full h-full object-cover object-top" onerror="this.parentElement.innerHTML = \'' +
+          renderFallbackText(char, isCenter).replace(/'/g, "\\'") +
+          '\'" />' +
+          '<div class="absolute inset-x-0 bottom-0 pt-4 pb-1.5 px-1 bg-gradient-to-t from-ink/95 via-ink/75 to-transparent flex flex-col items-center justify-end pointer-events-none">' +
+            '<span class="text-[8px] sm:text-[9px] tracking-[0.1em] text-gold/90 leading-none mb-0.5 truncate max-w-full">' + char.role + '</span>' +
+            '<span class="' + nameCls + ' tracking-[0.1em] leading-tight truncate max-w-full">' + char.shortName + '</span>' +
+          '</div>'
+        );
+      }
+
       function renderRelationStage() {
         if (!linesSvg || !nodesLayer) return;
 
-        const centerChar = getCharacterById(activeCenterId) || characters[0];
-        const connectedPeers = getConnectedPeers(centerChar.id);
+        var centerChar = getCharacterById(activeCenterId) || characters[0];
+        var connectedPeers = getConnectedPeers(centerChar.id);
 
         linesSvg.innerHTML = '';
         nodesLayer.innerHTML = '';
 
-        const cx = 50;
-        const cy = connectedPeers.length > 0 ? 63 : 46;
-        const totalPeers = connectedPeers.length;
+        var cx = 50;
+        var cy = connectedPeers.length > 0 ? 63 : 46;
+        var totalPeers = connectedPeers.length;
 
         connectedPeers.forEach(function (item, index) {
-          let angleRad;
+          var angleRad;
           if (totalPeers === 1) {
             angleRad = -Math.PI / 2;
           } else {
             angleRad = -Math.PI / 2 + (index * 2 * Math.PI) / totalPeers;
           }
 
-          const radiusX = totalPeers === 1 ? 0 : 28;
-          const radiusY = totalPeers === 1 ? 37 : 31;
+          var radiusX = totalPeers === 1 ? 0 : 28;
+          var radiusY = totalPeers === 1 ? 37 : 31;
 
-          const px = cx + radiusX * Math.cos(angleRad);
-          const py = cy + radiusY * Math.sin(angleRad);
+          var px = cx + radiusX * Math.cos(angleRad);
+          var py = cy + radiusY * Math.sin(angleRad);
 
-          const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+          var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
           line.setAttribute('x1', cx);
           line.setAttribute('y1', cy);
           line.setAttribute('x2', px);
@@ -775,9 +787,9 @@
           line.setAttribute('stroke-opacity', '0.85');
           linesSvg.appendChild(line);
 
-          const midX = (cx + px) / 2;
-          const midY = (cy + py) / 2;
-          const labelEl = document.createElement('div');
+          var midX = (cx + px) / 2;
+          var midY = (cy + py) / 2;
+          var labelEl = document.createElement('div');
           labelEl.style.left = midX + '%';
           labelEl.style.top = midY + '%';
           labelEl.className =
@@ -785,7 +797,7 @@
           labelEl.textContent = item.bidirectional ? '⇄ ' + item.label : item.label;
           nodesLayer.appendChild(labelEl);
 
-          const peerBtn = document.createElement('button');
+          var peerBtn = document.createElement('button');
           peerBtn.type = 'button';
           peerBtn.style.left = px + '%';
           peerBtn.style.top = py + '%';
@@ -801,7 +813,7 @@
           nodesLayer.appendChild(peerBtn);
         });
 
-        const centerNode = document.createElement('div');
+        var centerNode = document.createElement('div');
         centerNode.style.left = cx + '%';
         centerNode.style.top = cy + '%';
         centerNode.className =
@@ -811,7 +823,7 @@
         nodesLayer.appendChild(centerNode);
 
         if (connectedPeers.length === 0) {
-          const emptyHint = document.createElement('div');
+          var emptyHint = document.createElement('div');
           emptyHint.style.left = '50%';
           emptyHint.style.top = '74%';
           emptyHint.className =
@@ -826,13 +838,13 @@
         avatarLinksContainer.innerHTML = '';
 
         characters.forEach(function (char) {
-          const isCenter = char.id === activeCenterId;
+          var isCenter = char.id === activeCenterId;
 
-          const itemWrapper = document.createElement('div');
+          var itemWrapper = document.createElement('div');
           itemWrapper.setAttribute('role', 'listitem');
           itemWrapper.className = 'flex flex-col items-center w-full max-w-[96px]';
 
-          const btn = document.createElement('button');
+          var btn = document.createElement('button');
           btn.type = 'button';
           btn.setAttribute('aria-label', '檢視 ' + char.name + ' 的關係網');
           btn.className =
@@ -840,9 +852,47 @@
             (isCenter ? 'avatar-btn-active border-gold' : 'border-gold/35 hover:border-gold/80 bg-ink') +
             ' flex items-center justify-center overflow-hidden transition-all duration-300 cursor-pointer mb-2 relative group';
 
+          var textCls = isCenter ? 'text-gold' : 'text-[#C8C0B4] group-hover:text-gold';
+          var fallbackSpan = '<span class="text-xs sm:text-sm font-medium tracking-widest ' + textCls + ' transition-colors">' + char.shortName + '</span>';
+
           if (char.avatarUrl) {
-            btn.innerHTML = char.isPreCircled
-              ? '<img src="' + char.avatarUrl + '" alt="' + char.name + '" class="w-full h-full object-contain p-0.5" />'
-              : '<img src="' + char.avatarUrl + '" alt="' + char.name + '" class="w-full h-full object-cover object-top" />';
+            var imgCls = char.isPreCircled ? 'w-full h-full object-contain p-0.5' : 'w-full h-full object-cover object-top';
+            btn.innerHTML =
+              '<img src="' + char.avatarUrl + '" alt="' + char.name + '" class="' + imgCls + '" onerror="this.parentElement.innerHTML = \'' +
+              fallbackSpan.replace(/'/g, "\\'") +
+              '\'" />';
           } else {
-            const textCls = isCenter ? 'text-gold' : 'text-[#C8C0B4] group-hover:text-gold';
+            btn.innerHTML = fallbackSpan;
+          }
+
+          btn.addEventListener('click', function () {
+            setActiveCenter(char.id);
+          });
+
+          var nameLabel = document.createElement('span');
+          nameLabel.className = 'text-[11px] sm:text-xs tracking-[0.08em] text-center leading-snug ' + (isCenter ? 'text-gold font-medium' : 'text-[#E0D9CE]');
+          nameLabel.textContent = char.name;
+
+          var roleLabel = document.createElement('span');
+          roleLabel.className = 'text-[9px] sm:text-[10px] tracking-[0.06em] text-[#8E877D] text-center mt-0.5 leading-tight';
+          roleLabel.textContent = char.role;
+
+          itemWrapper.appendChild(btn);
+          itemWrapper.appendChild(nameLabel);
+          itemWrapper.appendChild(roleLabel);
+          avatarLinksContainer.appendChild(itemWrapper);
+        });
+      }
+
+      function setActiveCenter(characterId) {
+        activeCenterId = characterId;
+        renderRelationStage();
+        renderAvatarLinks();
+      }
+
+      renderRelationStage();
+      renderAvatarLinks();
+    });
+  </script>
+</body>
+</html>
