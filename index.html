@@ -717,37 +717,67 @@
         return peers;
       }
 
-      function renderFallbackText(char, isCenter) {
-        var nameCls = isCenter
-          ? 'text-sm sm:text-base font-semibold text-[#F5F1E8]'
-          : 'text-xs sm:text-sm font-medium text-[#F0ECE3] group-hover:text-gold';
-        return (
-          '<span class="text-[9px] sm:text-[10px] tracking-[0.12em] text-gold/80 mb-0.5 truncate max-w-full">' + char.role + '</span>' +
-          '<span class="' + nameCls + ' tracking-[0.12em] transition-colors leading-tight">' + char.name + '</span>'
-        );
+      function populateFallbackText(container, char, isCenter) {
+        container.innerHTML = '';
+        var roleEl = document.createElement('span');
+        roleEl.className = 'text-[9px] sm:text-[10px] tracking-[0.12em] text-gold/80 mb-0.5 truncate max-w-full';
+        roleEl.textContent = char.role;
+
+        var nameEl = document.createElement('span');
+        nameEl.className =
+          (isCenter
+            ? 'text-sm sm:text-base font-semibold text-[#F5F1E8]'
+            : 'text-xs sm:text-sm font-medium text-[#F0ECE3] group-hover:text-gold') +
+          ' tracking-[0.12em] transition-colors leading-tight';
+        nameEl.textContent = char.name;
+
+        container.appendChild(roleEl);
+        container.appendChild(nameEl);
       }
 
-      function renderBubbleInner(char, isCenter) {
+      function populateBubbleContent(container, char, isCenter) {
+        container.innerHTML = '';
         if (!char.avatarUrl) {
-          return renderFallbackText(char, isCenter);
+          populateFallbackText(container, char, isCenter);
+          return;
         }
+
+        var img = document.createElement('img');
+        img.src = char.avatarUrl;
+        img.alt = char.name;
+
         if (char.isPreCircled) {
-          return (
-            '<img src="' + char.avatarUrl + '" alt="' + char.name + '" class="w-full h-full object-contain p-0.5" onerror="this.parentElement.innerHTML = \'' +
-            renderFallbackText(char, isCenter).replace(/'/g, "\\'") +
-            '\'" />'
-          );
+          img.className = 'w-full h-full object-contain p-0.5';
+          img.addEventListener('error', function () {
+            populateFallbackText(container, char, isCenter);
+          });
+          container.appendChild(img);
+        } else {
+          img.className = 'w-full h-full object-cover object-top';
+          var overlay = document.createElement('div');
+          overlay.className =
+            'absolute inset-x-0 bottom-0 pt-4 pb-1.5 px-1 bg-gradient-to-t from-ink/95 via-ink/75 to-transparent flex flex-col items-center justify-end pointer-events-none';
+
+          var roleSpan = document.createElement('span');
+          roleSpan.className = 'text-[8px] sm:text-[9px] tracking-[0.1em] text-gold/90 leading-none mb-0.5 truncate max-w-full';
+          roleSpan.textContent = char.role;
+
+          var nameSpan = document.createElement('span');
+          nameSpan.className =
+            (isCenter ? 'text-xs sm:text-sm font-semibold text-[#F5F1E8]' : 'text-[10px] sm:text-xs font-medium text-[#E5E0D8]') +
+            ' tracking-[0.1em] leading-tight truncate max-w-full';
+          nameSpan.textContent = char.shortName;
+
+          overlay.appendChild(roleSpan);
+          overlay.appendChild(nameSpan);
+
+          img.addEventListener('error', function () {
+            populateFallbackText(container, char, isCenter);
+          });
+
+          container.appendChild(img);
+          container.appendChild(overlay);
         }
-        var nameCls = isCenter ? 'text-xs sm:text-sm font-semibold text-[#F5F1E8]' : 'text-[10px] sm:text-xs font-medium text-[#E5E0D8]';
-        return (
-          '<img src="' + char.avatarUrl + '" alt="' + char.name + '" class="w-full h-full object-cover object-top" onerror="this.parentElement.innerHTML = \'' +
-          renderFallbackText(char, isCenter).replace(/'/g, "\\'") +
-          '\'" />' +
-          '<div class="absolute inset-x-0 bottom-0 pt-4 pb-1.5 px-1 bg-gradient-to-t from-ink/95 via-ink/75 to-transparent flex flex-col items-center justify-end pointer-events-none">' +
-            '<span class="text-[8px] sm:text-[9px] tracking-[0.1em] text-gold/90 leading-none mb-0.5 truncate max-w-full">' + char.role + '</span>' +
-            '<span class="' + nameCls + ' tracking-[0.1em] leading-tight truncate max-w-full">' + char.shortName + '</span>' +
-          '</div>'
-        );
       }
 
       function renderRelationStage() {
@@ -805,7 +835,7 @@
           peerBtn.className =
             'bubble-node absolute -translate-x-1/2 -translate-y-1/2 z-20 w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden bg-ink-light/95 border border-gold/60 hover:border-gold flex flex-col items-center justify-center p-1.5 text-center shadow-lg cursor-pointer group';
 
-          peerBtn.innerHTML = renderBubbleInner(item.character, false);
+          populateBubbleContent(peerBtn, item.character, false);
           peerBtn.addEventListener('click', function () {
             setActiveCenter(item.character.id);
           });
@@ -819,7 +849,7 @@
         centerNode.className =
           'bubble-center absolute -translate-x-1/2 -translate-y-1/2 z-20 w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden bg-ink border-2 border-gold flex flex-col items-center justify-center p-1 text-center relative';
 
-        centerNode.innerHTML = renderBubbleInner(centerChar, true);
+        populateBubbleContent(centerNode, centerChar, true);
         nodesLayer.appendChild(centerNode);
 
         if (connectedPeers.length === 0) {
@@ -853,16 +883,20 @@
             ' flex items-center justify-center overflow-hidden transition-all duration-300 cursor-pointer mb-2 relative group';
 
           var textCls = isCenter ? 'text-gold' : 'text-[#C8C0B4] group-hover:text-gold';
-          var fallbackSpan = '<span class="text-xs sm:text-sm font-medium tracking-widest ' + textCls + ' transition-colors">' + char.shortName + '</span>';
+
+          function setTextFallback() {
+            btn.innerHTML = '<span class="text-xs sm:text-sm font-medium tracking-widest ' + textCls + ' transition-colors">' + char.shortName + '</span>';
+          }
 
           if (char.avatarUrl) {
-            var imgCls = char.isPreCircled ? 'w-full h-full object-contain p-0.5' : 'w-full h-full object-cover object-top';
-            btn.innerHTML =
-              '<img src="' + char.avatarUrl + '" alt="' + char.name + '" class="' + imgCls + '" onerror="this.parentElement.innerHTML = \'' +
-              fallbackSpan.replace(/'/g, "\\'") +
-              '\'" />';
+            var img = document.createElement('img');
+            img.src = char.avatarUrl;
+            img.alt = char.name;
+            img.className = char.isPreCircled ? 'w-full h-full object-contain p-0.5' : 'w-full h-full object-cover object-top';
+            img.addEventListener('error', setTextFallback);
+            btn.appendChild(img);
           } else {
-            btn.innerHTML = fallbackSpan;
+            setTextFallback();
           }
 
           btn.addEventListener('click', function () {
