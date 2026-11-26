@@ -144,7 +144,7 @@
     }
 
     /* =========================================================================
-       人物相関図氣泡動效
+       人物關關係圖氣泡動效
        ========================================================================= */
     .bubble-node {
       transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease, border-color 0.35s ease;
@@ -236,7 +236,7 @@
       aria-label="橫濱街景氛圍輪播"
       class="relative w-full lg:w-1/2 h-[48dvh] lg:h-[100dvh] overflow-hidden bg-[#070A0C] select-none"
     >
-      <!-- 輪播圖片層 (內建深色橫濱夜景氛圍視覺與 SVG 備援) -->
+      <!-- 輪播圖片層 -->
       <div id="slides-container" class="relative w-full h-full">
         <!-- Slide 1 -->
         <div class="slide-item slide-active absolute inset-0" data-slide="0">
@@ -320,21 +320,79 @@
         <div class="w-10 h-[1px] bg-gold/35"></div>
       </div>
 
-      <!-- 中央：圖片 1 預留位方框 -->
-      <div class="w-full max-w-[260px] sm:max-w-[300px] lg:max-w-[340px] aspect-square my-auto flex flex-col items-center justify-center relative border border-dashed border-gold/30 rounded bg-ink-card/50 p-6">
-        <!-- 四角鈍金直角飾線 -->
-        <span class="absolute top-2.5 left-2.5 w-3.5 h-3.5 border-t border-l border-gold/75"></span>
-        <span class="absolute top-2.5 right-2.5 w-3.5 h-3.5 border-t border-r border-gold/75"></span>
-        <span class="absolute bottom-2.5 left-2.5 w-3.5 h-3.5 border-b border-l border-gold/75"></span>
-        <span class="absolute bottom-2.5 right-2.5 w-3.5 h-3.5 border-b border-r border-gold/75"></span>
+      <!-- 中央：八幡組家紋視覺 (dai.png 濾色融合 + SVG 備援) -->
+      <div class="w-full max-w-[240px] sm:max-w-[290px] lg:max-w-[330px] aspect-square my-auto flex items-center justify-center relative select-none">
+        <img
+          id="emblem-img"
+          src="./dai.png"
+          alt="八幡組家紋"
+          class="w-full h-full object-contain mix-blend-lighten contrast-[1.05]"
+          onerror="this.classList.add('hidden'); document.getElementById('emblem-svg-fallback').classList.remove('hidden');"
+        />
 
-        <!-- 預留位中央菱形「八」字線條與文字 -->
-        <div class="w-14 h-14 sm:w-16 sm:h-16 rotate-45 border border-gold/55 flex items-center justify-center mb-5">
-          <span class="-rotate-45 text-gold text-base sm:text-lg font-medium tracking-widest">八</span>
-        </div>
+        <!-- 內建 SVG 八幡組圓形家紋備援 (當 ./dai.png 尚未載入或於預覽環境時顯示) -->
+        <svg
+          id="emblem-svg-fallback"
+          viewBox="0 0 400 400"
+          aria-label="八幡組家紋"
+          class="hidden w-full h-full max-w-[260px] max-h-[260px] drop-shadow-[0_0_20px_rgba(150,114,73,0.18)]"
+        >
+          <!-- 外圓雙環 -->
+          <circle cx="200" cy="200" r="142" fill="#171B1E" stroke="#C5A374" stroke-width="11" />
+          <circle cx="200" cy="200" r="127" fill="none" stroke="#C5A374" stroke-width="2.5" opacity="0.7" />
 
-        <p class="text-xs sm:text-sm tracking-[0.3em] text-[#B8B0A4] mb-1.5">圖片 1 預留位</p>
-        <p class="text-[10px] tracking-[0.25em] text-gold/65 uppercase">IMAGE SLOT RESERVED</p>
+          <!-- 左右羽翼紋飾 -->
+          <g fill="#C5A374">
+            <path d="M155 125 L176 196 L167 199 L144 130 Z" />
+            <path d="M134 143 L165 204 L156 208 L124 148 Z" />
+            <path d="M116 165 L154 214 L146 220 L107 171 Z" />
+
+            <path d="M245 125 L224 196 L233 199 L256 130 Z" />
+            <path d="M266 143 L235 204 L244 208 L276 148 Z" />
+            <path d="M284 165 L246 214 L254 220 L293 171 Z" />
+          </g>
+
+          <!-- 下方鱗片紋飾 -->
+          <g fill="#C5A374" stroke="#171B1E" stroke-width="2">
+            <!-- 第一列 -->
+            <path d="M132 234 Q150 222 168 234 Q158 248 132 234 Z" />
+            <path d="M168 234 Q185 222 198 234 Q188 248 168 234 Z" />
+            <path d="M202 234 Q215 222 232 234 Q212 248 202 234 Z" />
+            <path d="M232 234 Q250 222 268 234 Q242 248 232 234 Z" />
+            <!-- 第二列 -->
+            <path d="M144 252 Q162 240 178 252 Q168 266 144 252 Z" />
+            <path d="M178 252 Q192 240 200 252 Q190 266 178 252 Z" />
+            <path d="M200 252 Q208 240 222 252 Q210 266 200 252 Z" />
+            <path d="M222 252 Q238 240 256 252 Q232 266 222 252 Z" />
+            <!-- 第三列 -->
+            <path d="M158 270 Q176 258 192 270 Q182 284 158 270 Z" />
+            <path d="M192 270 Q200 260 208 270 Q200 284 192 270 Z" />
+            <path d="M208 270 Q224 258 242 270 Q218 284 208 270 Z" />
+            <!-- 第四列 -->
+            <path d="M174 287 Q188 276 199 287 Q190 299 174 287 Z" />
+            <path d="M201 287 Q212 276 226 287 Q210 299 201 287 Z" />
+          </g>
+
+          <!-- 中央「八幡」字樣 -->
+          <text
+            x="200"
+            y="156"
+            text-anchor="middle"
+            fill="#C5A374"
+            font-size="44"
+            font-weight="600"
+            font-family='"Noto Serif JP", "Noto Serif TC", serif'
+          >八</text>
+          <text
+            x="200"
+            y="206"
+            text-anchor="middle"
+            fill="#C5A374"
+            font-size="44"
+            font-weight="600"
+            font-family='"Noto Serif JP", "Noto Serif TC", serif'
+          >幡</text>
+        </svg>
       </div>
 
       <!-- 下方：精準置中的「入場」按鈕與標註 -->
@@ -410,22 +468,17 @@
          區塊一：八幡組綱領 (緊湊扁平長方形雙層細線牌匾框，無任何「八」字圖案)
          ======================================================================= -->
     <section id="section-creed" class="scroll-mt-20 max-w-3xl mx-auto px-4 sm:px-6 mb-14 sm:mb-20">
-      <!-- 外層細線框 -->
       <div class="border border-gold/45 p-1.5 sm:p-2 rounded bg-ink-card/80 shadow-[0_10px_30px_rgba(0,0,0,0.45)]">
-        <!-- 內層細線框 (高度精簡扁平) -->
         <div class="relative border border-gold/30 px-5 py-4 sm:px-10 sm:py-5 rounded-sm flex flex-col items-center justify-center text-center">
-          <!-- 四角經典直角細線飾框 -->
           <span class="absolute top-1.5 left-1.5 w-2.5 h-2.5 border-t border-l border-gold/75"></span>
           <span class="absolute top-1.5 right-1.5 w-2.5 h-2.5 border-t border-r border-gold/75"></span>
           <span class="absolute bottom-1.5 left-1.5 w-2.5 h-2.5 border-b border-l border-gold/75"></span>
           <span class="absolute bottom-1.5 right-1.5 w-2.5 h-2.5 border-b border-r border-gold/75"></span>
 
-          <!-- 小標題 -->
           <h2 class="text-[11px] sm:text-xs tracking-[0.32em] text-gold/90 font-medium mb-2 sm:mb-2.5">
             ── 八幡組綱領 ──
           </h2>
 
-          <!-- 綱領正文 (緊湊精緻字級) -->
           <p class="text-xs sm:text-sm md:text-base tracking-[0.16em] sm:tracking-[0.22em] leading-relaxed text-[#EDE8DF] font-medium">
             一一八幡組は侠道精神に則り国家社会の興隆に貢献せんことを期す
           </p>
@@ -444,7 +497,6 @@
 
       <!-- 垂直時間軸容器 -->
       <div class="relative">
-        <!-- 中央垂直金線 (手機靠左、電腦置中) -->
         <div class="absolute top-2 bottom-2 left-4 md:left-1/2 md:-translate-x-1/2 w-[1px] bg-gradient-to-b from-gold/20 via-gold/55 to-gold/20"></div>
 
         <div class="space-y-8 sm:space-y-10">
@@ -509,7 +561,7 @@
     </section>
 
     <!-- =======================================================================
-         區塊三：人物關關係圖 (純粹氣泡關係網，無篩選列、無角色詳細圖卡)
+         區塊三：人物關關係圖 (純粹氣泡關係網，無篩選列、無角色詳細圖卡、無頁尾)
          ======================================================================= -->
     <section id="section-relations" class="scroll-mt-20 max-w-4xl mx-auto px-4 sm:px-6">
       <div class="text-center mb-8 sm:mb-10">
@@ -522,21 +574,20 @@
 
       <!-- 關係圖外框容器 -->
       <div class="border border-gold/30 rounded bg-ink-card/75 p-4 sm:p-7 relative">
-        <!-- 四角微飾 -->
         <span class="absolute top-2 left-2 w-3 h-3 border-t border-l border-gold/55 pointer-events-none"></span>
         <span class="absolute top-2 right-2 w-3 h-3 border-t border-r border-gold/55 pointer-events-none"></span>
         <span class="absolute bottom-2 left-2 w-3 h-3 border-b border-l border-gold/55 pointer-events-none"></span>
         <span class="absolute bottom-2 right-2 w-3 h-3 border-b border-r border-gold/55 pointer-events-none"></span>
 
-        <!-- 1. 上方：動態焦點關係畫布 (預設以八幡凪為中心) -->
+        <!-- 1. 上方：動態焦點關係畫布 (440px 手機 / 500px 桌面，預設以八幡凪為中心) -->
         <div
           id="relation-stage"
-          class="relative w-full h-[320px] sm:h-[380px] rounded bg-ink/80 border border-gold/15 overflow-hidden mb-7 select-none"
+          class="relative w-full h-[440px] sm:h-[500px] rounded bg-ink/80 border border-gold/15 overflow-hidden mb-7 select-none"
         >
           <!-- 背景同心圓刻度紋理 -->
           <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div class="w-44 h-44 sm:w-56 sm:h-56 rounded-full border border-gold/10"></div>
-            <div class="absolute w-72 h-72 sm:w-96 sm:h-96 rounded-full border border-dashed border-gold/10"></div>
+            <div class="w-48 h-48 sm:w-64 sm:h-64 rounded-full border border-gold/10"></div>
+            <div class="absolute w-80 h-80 sm:w-[26rem] sm:h-[26rem] rounded-full border border-dashed border-gold/10"></div>
           </div>
 
           <!-- SVG 雙向鈍金連線層 -->
@@ -544,7 +595,7 @@
             id="relation-lines-svg"
             viewBox="0 0 100 100"
             preserveAspectRatio="none"
-            class="absolute inset-0 w-full h-full pointer-events-none"
+            class="absolute inset-0 w-full h-full z-10 pointer-events-none"
           ></svg>
 
           <!-- 連線標籤與圓形氣泡節點層 -->
@@ -558,7 +609,7 @@
           <div class="flex-1 h-[1px] bg-gold/20"></div>
         </div>
 
-        <!-- 2. 下方：全員圓形氣泡超連結列 (手機 3 欄、平板 5 欄、桌面 7 欄) -->
+        <!-- 2. 下方：全員圓形氣泡超連結列 -->
         <div
           id="characterAvatarLinks"
           role="list"
@@ -595,12 +646,10 @@
         clearTimeout(shojiTimer);
         shojiLeft.classList.remove('shoji-open-left');
         shojiRight.classList.remove('shoji-open-right');
-        // 強制重繪後再次拉開紙門
         void shojiLeft.offsetWidth;
         openShojiDoors(650);
       }
 
-      // 初次進入自動拉開障子紙門
       openShojiDoors(400);
 
       if (replayShojiBtn) {
@@ -692,12 +741,10 @@
         if (isTransitioning) return;
         isTransitioning = true;
 
-        // 1. 墨色簾幕淡入
         pageCurtain.classList.remove('pointer-events-none', 'opacity-0');
         pageCurtain.classList.add('pointer-events-auto', 'opacity-100');
 
         setTimeout(() => {
-          // 2. 切換顯示頁面並捲動至最頂端
           if (targetPage === 'content') {
             pageHome.classList.add('hidden');
             replayShojiBtn.classList.add('hidden');
@@ -711,7 +758,6 @@
 
           window.scrollTo({ top: 0, behavior: 'instant' });
 
-          // 3. 墨色簾幕淡出
           requestAnimationFrame(() => {
             pageCurtain.classList.remove('opacity-100');
             pageCurtain.classList.add('opacity-0');
@@ -734,119 +780,30 @@
       });
 
       /* -----------------------------------------------------------------------
-         D. 人物相関図資料與互動邏輯 (13 位登場人物 & 雙向關係氣泡網)
+         D. 人物關關係圖資料與互動邏輯 (13 位登場人物 & 雙向關係氣泡網)
          ----------------------------------------------------------------------- */
       const characters = [
-        {
-          id: 'nagi',
-          name: '八幡 凪',
-          shortName: '凪',
-          role: '少當家候補',
-          avatarUrl: ''
-        },
-        {
-          id: 'kazuki',
-          name: '小泉 一樹',
-          shortName: '一樹',
-          role: '一般組員',
-          avatarUrl: ''
-        },
-        {
-          id: 'kana',
-          name: '穎川 歌那',
-          shortName: '歌那',
-          role: '外部勢力',
-          avatarUrl: ''
-        },
-        {
-          id: 'gen',
-          name: '宇佐 玄',
-          shortName: '玄',
-          role: '外部勢力',
-          avatarUrl: ''
-        },
-        {
-          id: 'ryuji',
-          name: '八幡 龍司',
-          shortName: '龍司',
-          role: '組長',
-          avatarUrl: ''
-        },
-        {
-          id: 'koubai',
-          name: '應 紅梅',
-          shortName: '紅梅',
-          role: '幹部',
-          avatarUrl: ''
-        },
-        {
-          id: 'byakushi',
-          name: '應 白芷',
-          shortName: '白芷',
-          role: '外部勢力',
-          avatarUrl: ''
-        },
-        {
-          id: 'lin',
-          name: '林',
-          shortName: '林',
-          role: '外部勢力',
-          avatarUrl: ''
-        },
-        {
-          id: 'kuon',
-          name: '嶽釜 久遠',
-          shortName: '久遠',
-          role: '少當家候補',
-          avatarUrl: ''
-        },
-        {
-          id: 'rui',
-          name: '若色 累',
-          shortName: '累',
-          role: '前幹部',
-          avatarUrl: ''
-        },
-        {
-          id: 'mimiko',
-          name: '佐野 美美子',
-          shortName: '美美子',
-          role: '外部勢力',
-          avatarUrl: ''
-        },
-        {
-          id: 'tsubasa',
-          name: '鷲井 翼',
-          shortName: '翼',
-          role: '外部勢力',
-          avatarUrl: ''
-        },
-        {
-          id: 'subaru',
-          name: '布施谷 昴',
-          shortName: '昴',
-          role: '一般組員',
-          avatarUrl: ''
-        }
+        { id: 'nagi', name: '八幡 凪', shortName: '凪', role: '少當家候補', avatarUrl: '' },
+        { id: 'kazuki', name: '小泉 一樹', shortName: '一樹', role: '一般組員', avatarUrl: '' },
+        { id: 'kana', name: '穎川 歌那', shortName: '歌那', role: '外部勢力', avatarUrl: '' },
+        { id: 'gen', name: '宇佐 玄', shortName: '玄', role: '外部勢力', avatarUrl: '' },
+        { id: 'ryuji', name: '八幡 龍司', shortName: '龍司', role: '組長', avatarUrl: '' },
+        { id: 'koubai', name: '應 紅梅', shortName: '紅梅', role: '幹部', avatarUrl: '' },
+        { id: 'byakushi', name: '應 白芷', shortName: '白芷', role: '外部勢力', avatarUrl: '' },
+        { id: 'lin', name: '林', shortName: '林', role: '外部勢力', avatarUrl: '' },
+        { id: 'kuon', name: '嶽釜 久遠', shortName: '久遠', role: '少當家候補', avatarUrl: '' },
+        { id: 'rui', name: '若色 累', shortName: '累', role: '前幹部', avatarUrl: '' },
+        { id: 'mimiko', name: '佐野 美美子', shortName: '美美子', role: '外部勢力', avatarUrl: '' },
+        { id: 'tsubasa', name: '鷲井 翼', shortName: '翼', role: '外部勢力', avatarUrl: '' },
+        { id: 'subaru', name: '布施谷 昴', shortName: '昴', role: '一般組員', avatarUrl: '' }
       ];
 
-      // 關係連線資料 (雙向)
       const relationships = [
-        {
-          source: 'ryuji',
-          target: 'nagi',
-          label: '祖孫',
-          bidirectional: true
-        },
-        {
-          source: 'koubai',
-          target: 'byakushi',
-          label: '祖孫',
-          bidirectional: true
-        }
+        { source: 'ryuji', target: 'nagi', label: '祖孫', bidirectional: true },
+        { source: 'koubai', target: 'byakushi', label: '祖孫', bidirectional: true }
       ];
 
-      let activeCenterId = 'nagi'; // 預設以八幡凪為中心
+      let activeCenterId = 'nagi';
 
       const linesSvg = document.getElementById('relation-lines-svg');
       const nodesLayer = document.getElementById('relation-nodes-layer');
@@ -856,7 +813,6 @@
         return characters.find((c) => c.id === id);
       }
 
-      // 取得與指定角色直接相連的夥伴與標籤
       function getConnectedPeers(centerId) {
         const peers = [];
         relationships.forEach((rel) => {
@@ -871,7 +827,6 @@
         return peers;
       }
 
-      // 渲染上方動態焦點關係畫布
       function renderRelationStage() {
         if (!linesSvg || !nodesLayer) return;
 
@@ -881,55 +836,43 @@
         linesSvg.innerHTML = '';
         nodesLayer.innerHTML = '';
 
-        // 定義 SVG 雙向箭頭標記
-        const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
-        defs.innerHTML = `
-          <marker id="gold-arrow-end" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
-            <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#967249" opacity="0.85"></path>
-          </marker>
-        `;
-        linesSvg.appendChild(defs);
-
-        // 中心氣泡位置 (百分比座標)
         const cx = 50;
-        const cy = connectedPeers.length > 0 ? 50 : 46;
-
-        // 渲染周圍關聯氣泡與連線
+        const cy = connectedPeers.length > 0 ? 63 : 46;
         const totalPeers = connectedPeers.length;
+
         connectedPeers.forEach((item, index) => {
-          // 若只有 1 位關聯人物，安排在正上方偏左/右側或優雅的斜上方，避開正重疊
           let angleRad;
           if (totalPeers === 1) {
-            angleRad = -Math.PI / 2; // 正上方，手機與電腦最清晰
+            angleRad = -Math.PI / 2;
           } else {
             angleRad = -Math.PI / 2 + (index * 2 * Math.PI) / totalPeers;
           }
 
-          const radiusX = totalPeers === 1 ? 0 : 31;
-          const radiusY = totalPeers === 1 ? 30 : 31;
+          const radiusX = totalPeers === 1 ? 0 : 28;
+          const radiusY = totalPeers === 1 ? 37 : 31;
 
           const px = cx + radiusX * Math.cos(angleRad);
           const py = cy + radiusY * Math.sin(angleRad);
 
-          // 繪製連線 (稍微內縮至氣泡邊緣)
+          // 繪製筆直鈍金連線
           const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
           line.setAttribute('x1', cx);
           line.setAttribute('y1', cy);
           line.setAttribute('x2', px);
           line.setAttribute('y2', py);
           line.setAttribute('stroke', '#967249');
-          line.setAttribute('stroke-width', '0.45');
-          line.setAttribute('stroke-opacity', '0.75');
+          line.setAttribute('stroke-width', '0.55');
+          line.setAttribute('stroke-opacity', '0.85');
           linesSvg.appendChild(line);
 
-          // 連線中點關係總稱標籤
+          // 連線中點關係總稱標籤 (z-30 確保不被氣泡遮蓋)
           const midX = (cx + px) / 2;
           const midY = (cy + py) / 2;
           const labelEl = document.createElement('div');
           labelEl.style.left = `${midX}%`;
           labelEl.style.top = `${midY}%`;
           labelEl.className =
-            'absolute -translate-x-1/2 -translate-y-1/2 z-20 px-2.5 py-0.5 text-[11px] sm:text-xs tracking-[0.22em] text-gold bg-ink border border-gold/55 rounded-full shadow-md whitespace-nowrap pointer-events-none';
+            'absolute -translate-x-1/2 -translate-y-1/2 z-30 px-3 py-0.5 text-[11px] sm:text-xs tracking-[0.22em] text-gold bg-ink border border-gold/70 rounded-full shadow-lg whitespace-nowrap pointer-events-none';
           labelEl.textContent = item.bidirectional ? `⇄ ${item.label}` : item.label;
           nodesLayer.appendChild(labelEl);
 
@@ -959,7 +902,7 @@
         centerNode.style.left = `${cx}%`;
         centerNode.style.top = `${cy}%`;
         centerNode.className =
-          'bubble-center absolute -translate-x-1/2 -translate-y-1/2 z-30 w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-ink border-2 border-gold flex flex-col items-center justify-center p-2 text-center';
+          'bubble-center absolute -translate-x-1/2 -translate-y-1/2 z-20 w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-ink border-2 border-gold flex flex-col items-center justify-center p-2 text-center';
 
         centerNode.innerHTML = `
           <span class="text-[9px] sm:text-[10px] tracking-[0.16em] text-gold mb-0.5 truncate max-w-full">${centerChar.role}</span>
@@ -967,11 +910,10 @@
         `;
         nodesLayer.appendChild(centerNode);
 
-        // 若該角色尚未登錄任何連線，顯示低調提示
         if (connectedPeers.length === 0) {
           const emptyHint = document.createElement('div');
           emptyHint.style.left = '50%';
-          emptyHint.style.top = '76%';
+          emptyHint.style.top = '74%';
           emptyHint.className =
             'absolute -translate-x-1/2 -translate-y-1/2 z-20 px-3.5 py-1 text-[11px] sm:text-xs tracking-[0.25em] text-[#8E877D] border border-gold/20 rounded-full bg-ink/80 whitespace-nowrap';
           emptyHint.textContent = '関係線未登録';
@@ -979,7 +921,6 @@
         }
       }
 
-      // 渲染下方全員 13 位圓形氣泡超連結列
       function renderAvatarLinks() {
         if (!avatarLinksContainer) return;
         avatarLinksContainer.innerHTML = '';
@@ -1035,7 +976,6 @@
         renderAvatarLinks();
       }
 
-      // 初始化關係圖與全員氣泡選單
       renderRelationStage();
       renderAvatarLinks();
     });
