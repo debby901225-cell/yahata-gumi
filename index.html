@@ -484,7 +484,16 @@
             viewBox="0 0 100 100"
             preserveAspectRatio="none"
             class="absolute inset-0 w-full h-full z-10 pointer-events-none"
-          ></svg>
+          >
+            <defs>
+              <marker id="arrow-gold" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="4.2" markerHeight="4.2" orient="auto">
+                <path d="M 0 1.5 L 8.5 5 L 0 8.5 z" fill="#B38E63" />
+              </marker>
+              <marker id="arrow-silver" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="4.2" markerHeight="4.2" orient="auto">
+                <path d="M 0 1.5 L 8.5 5 L 0 8.5 z" fill="#C8B9A6" />
+              </marker>
+            </defs>
+          </svg>
 
           <div id="relation-nodes-layer" class="absolute inset-0 w-full h-full"></div>
         </div>
@@ -1093,14 +1102,31 @@
         return docBtn;
       }
 
+      function getCompassArrow(dx, dy) {
+        var angleDeg = Math.atan2(dy, dx) * (180 / Math.PI);
+        if (angleDeg >= -22.5 && angleDeg < 22.5) return '→';
+        if (angleDeg >= 22.5 && angleDeg < 67.5) return '↘';
+        if (angleDeg >= 67.5 && angleDeg < 112.5) return '↓';
+        if (angleDeg >= 112.5 && angleDeg < 157.5) return '↙';
+        if (angleDeg >= 157.5 || angleDeg < -157.5) return '←';
+        if (angleDeg >= -157.5 && angleDeg < -112.5) return '↖';
+        if (angleDeg >= -112.5 && angleDeg < -67.5) return '↑';
+        return '↗';
+      }
+
       function renderRelationStage() {
         if (!linesSvg || !nodesLayer) return;
 
         var centerChar = getCharacterById(activeCenterId) || characters[0];
         var connectedPeers = getConnectedPeers(centerChar.id);
 
-        linesSvg.innerHTML = '';
+        Array.prototype.slice.call(linesSvg.querySelectorAll('line')).forEach(function (el) {
+          el.remove();
+        });
         nodesLayer.innerHTML = '';
+
+        var stageRect = linesSvg.getBoundingClientRect();
+        var aspectRatio = (stageRect.width && stageRect.height) ? (stageRect.width / stageRect.height) : 1;
 
         var totalPeers = connectedPeers.length;
         var cx = 50;
@@ -1122,15 +1148,72 @@
           var px = cx + radiusX * Math.cos(angleRad);
           var py = cy + radiusY * Math.sin(angleRad);
 
-          var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-          line.setAttribute('x1', cx);
-          line.setAttribute('y1', cy);
-          line.setAttribute('x2', px);
-          line.setAttribute('y2', py);
-          line.setAttribute('stroke', '#967249');
-          line.setAttribute('stroke-width', '0.55');
-          line.setAttribute('stroke-opacity', '0.85');
-          linesSvg.appendChild(line);
+          var vx = px - cx;
+          var vy = py - cy;
+          var dist = Math.hypot(vx, vy) || 1;
+          var ux = vx / dist;
+          var uy = vy / dist;
+          var perpX = -uy;
+          var perpY = ux;
+
+          var centerStop = 10.5;
+          var peerStop = 8.8;
+
+          if (!item.bidirectional && item.label && item.reverseLabel) {
+            var offset = 0.85;
+            var lineOut = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            lineOut.setAttribute('x1', cx + ux * centerStop + perpX * offset);
+            lineOut.setAttribute('y1', cy + uy * centerStop + perpY * offset);
+            lineOut.setAttribute('x2', px - ux * peerStop + perpX * offset);
+            lineOut.setAttribute('y2', py - uy * peerStop + perpY * offset);
+            lineOut.setAttribute('stroke', '#B38E63');
+            lineOut.setAttribute('stroke-width', '0.5');
+            lineOut.setAttribute('stroke-opacity', '0.92');
+            lineOut.setAttribute('marker-end', 'url(#arrow-gold)');
+            linesSvg.appendChild(lineOut);
+
+            var lineIn = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            lineIn.setAttribute('x1', px - ux * peerStop - perpX * offset);
+            lineIn.setAttribute('y1', py - uy * peerStop - perpY * offset);
+            lineIn.setAttribute('x2', cx + ux * centerStop - perpX * offset);
+            lineIn.setAttribute('y2', cy + uy * centerStop - perpY * offset);
+            lineIn.setAttribute('stroke', '#C8B9A6');
+            lineIn.setAttribute('stroke-width', '0.5');
+            lineIn.setAttribute('stroke-opacity', '0.85');
+            lineIn.setAttribute('stroke-dasharray', '1.4 0.9');
+            lineIn.setAttribute('marker-end', 'url(#arrow-silver)');
+            linesSvg.appendChild(lineIn);
+          } else {
+            var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            if (!item.bidirectional && !item.label && item.reverseLabel) {
+              line.setAttribute('x1', px - ux * peerStop);
+              line.setAttribute('y1', py - uy * peerStop);
+              line.setAttribute('x2', cx + ux * centerStop);
+              line.setAttribute('y2', cy + uy * centerStop);
+              line.setAttribute('stroke', '#C8B9A6');
+              line.setAttribute('stroke-width', '0.55');
+              line.setAttribute('stroke-opacity', '0.9');
+              line.setAttribute('marker-end', 'url(#arrow-silver)');
+            } else if (!item.bidirectional && item.label) {
+              line.setAttribute('x1', cx + ux * centerStop);
+              line.setAttribute('y1', cy + uy * centerStop);
+              line.setAttribute('x2', px - ux * peerStop);
+              line.setAttribute('y2', py - uy * peerStop);
+              line.setAttribute('stroke', '#B38E63');
+              line.setAttribute('stroke-width', '0.55');
+              line.setAttribute('stroke-opacity', '0.92');
+              line.setAttribute('marker-end', 'url(#arrow-gold)');
+            } else {
+              line.setAttribute('x1', cx);
+              line.setAttribute('y1', cy);
+              line.setAttribute('x2', px);
+              line.setAttribute('y2', py);
+              line.setAttribute('stroke', '#967249');
+              line.setAttribute('stroke-width', '0.55');
+              line.setAttribute('stroke-opacity', '0.85');
+            }
+            linesSvg.appendChild(line);
+          }
 
           var hasAnyLabel = item.bidirectional ? Boolean(item.label) : Boolean(item.label || item.reverseLabel);
           if (hasAnyLabel) {
@@ -1142,24 +1225,29 @@
             labelEl.style.left = midX + '%';
             labelEl.style.top = midY + '%';
 
+            var visualDx = (px - cx) * aspectRatio;
+            var visualDy = (py - cy);
+            var arrowToPeer = getCompassArrow(visualDx, visualDy);
+            var arrowToCenter = getCompassArrow(-visualDx, -visualDy);
+
             if (item.bidirectional) {
               labelEl.className =
                 'absolute -translate-x-1/2 -translate-y-1/2 z-30 px-2.5 py-0.5 text-[10px] sm:text-xs tracking-[0.18em] text-gold bg-ink/95 border border-gold/70 rounded-full shadow-lg whitespace-nowrap pointer-events-none';
               labelEl.textContent = '⇄ ' + item.label;
             } else if (item.label && item.reverseLabel) {
               labelEl.className =
-                'absolute -translate-x-1/2 -translate-y-1/2 z-30 px-3 py-1 text-[10px] sm:text-[11px] tracking-[0.14em] text-gold bg-ink/95 border border-gold/70 rounded-xl shadow-lg whitespace-nowrap pointer-events-none flex flex-col items-center gap-0.5 leading-tight';
+                'absolute -translate-x-1/2 -translate-y-1/2 z-30 px-3 py-1 text-[10px] sm:text-[11px] tracking-[0.12em] text-gold bg-ink/95 border border-gold/70 rounded-xl shadow-lg whitespace-nowrap pointer-events-none flex flex-col items-center gap-0.5 leading-tight';
               labelEl.innerHTML =
-                '<span>→ ' + item.label + '</span>' +
-                '<span class="text-[#C8B9A6] text-[9px] sm:text-[10px]">← ' + item.reverseLabel + '</span>';
+                '<span>' + centerChar.shortName + ' ' + arrowToPeer + ' ' + item.character.shortName + '：' + item.label + '</span>' +
+                '<span class="text-[#C8B9A6] text-[9px] sm:text-[10px]">' + item.character.shortName + ' ' + arrowToCenter + ' ' + centerChar.shortName + '：' + item.reverseLabel + '</span>';
             } else if (item.label) {
               labelEl.className =
-                'absolute -translate-x-1/2 -translate-y-1/2 z-30 px-2.5 py-0.5 text-[10px] sm:text-xs tracking-[0.16em] text-gold bg-ink/95 border border-gold/70 rounded-full shadow-lg whitespace-nowrap pointer-events-none';
-              labelEl.textContent = '→ ' + item.label;
+                'absolute -translate-x-1/2 -translate-y-1/2 z-30 px-2.5 py-0.5 text-[10px] sm:text-xs tracking-[0.14em] text-gold bg-ink/95 border border-gold/70 rounded-full shadow-lg whitespace-nowrap pointer-events-none';
+              labelEl.textContent = centerChar.shortName + ' ' + arrowToPeer + ' ' + item.character.shortName + '：' + item.label;
             } else {
               labelEl.className =
-                'absolute -translate-x-1/2 -translate-y-1/2 z-30 px-2.5 py-0.5 text-[10px] sm:text-xs tracking-[0.16em] text-[#C8B9A6] bg-ink/95 border border-gold/60 rounded-full shadow-lg whitespace-nowrap pointer-events-none';
-              labelEl.textContent = '← ' + item.reverseLabel;
+                'absolute -translate-x-1/2 -translate-y-1/2 z-30 px-2.5 py-0.5 text-[10px] sm:text-xs tracking-[0.14em] text-[#C8B9A6] bg-ink/95 border border-gold/60 rounded-full shadow-lg whitespace-nowrap pointer-events-none';
+              labelEl.textContent = item.character.shortName + ' ' + arrowToCenter + ' ' + centerChar.shortName + '：' + item.reverseLabel;
             }
 
             nodesLayer.appendChild(labelEl);
@@ -1269,6 +1357,12 @@
         renderRelationStage();
         renderAvatarLinks();
       }
+
+      window.addEventListener('resize', function () {
+        if (pageContent && !pageContent.classList.contains('hidden')) {
+          renderRelationStage();
+        }
+      });
 
       renderRelationStage();
       renderAvatarLinks();
