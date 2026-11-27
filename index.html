@@ -1588,9 +1588,9 @@
           id: 'gallery-01',
           tag: '挿絵・関連文章',
           title: '還是找點別的樂子比較好',
-          subtitle: '繪｜秋柴　文｜然然',
+          subtitle: '文｜然然；圖｜秋柴',
           imageUrl: './chi.PNG',
-          description: '收錄於八幡組史錄之視覺插畫與關聯短篇。',
+          description: '文｜然然；圖｜秋柴',
           links: [
             {
               label: '閱讀關聯文章：《還是找點別的樂子比較好》',
@@ -1630,20 +1630,21 @@
           tag: '関連文章集',
           title: '関連文章一覧',
           subtitle: '純文字關聯篇章合併收錄',
-          imageUrl: '',
+          imageUrl: 'https://images.pexels.com/photos/7867803/pexels-photo-7867803.jpeg?auto=compress&cs=tinysrgb&w=1400',
+          imageClass: 'w-full h-full object-cover brightness-[0.42] contrast-[1.15] saturate-[0.65]',
           isArticleCollection: true,
           description: '合併收錄目前無獨立配圖之關聯文章與日常番外篇，點擊下方各篇連結即可前往閱讀。',
           links: [
             {
-              label: '《數學作業》（凪與小泉一樹・初遇篇）',
+              label: '數學作業',
               url: 'https://telegra.ph/%E6%95%B8%E5%AD%B8%E4%BD%9C%E6%A5%AD-11-24'
             },
             {
-              label: '《意外救援》（凪與祈本秀太・結識篇）',
+              label: '意外救援',
               url: 'https://telegra.ph/%E6%84%8F%E5%A4%96%E6%95%91%E6%8F%B4-11-21'
             },
             {
-              label: '《定位器》（凪與宇佐玄・羈絆篇）',
+              label: '定位器',
               url: 'https://telegra.ph/%E5%AE%9A%E4%BD%8D%E5%99%A8-11-20'
             },
             {
@@ -1698,7 +1699,7 @@
             var bigImg = document.createElement('img');
             bigImg.src = item.imageUrl;
             bigImg.alt = item.title || '画廊圖片';
-            bigImg.className = 'w-full h-full max-h-[50dvh] object-contain rounded';
+            bigImg.className = item.imageClass ? (item.imageClass + ' max-h-[50dvh] rounded') : 'w-full h-full max-h-[50dvh] object-contain rounded';
             bigImg.addEventListener('error', function () {
               renderGalleryImageFallback(galleryModalImageBox, item.title);
             });
@@ -1799,7 +1800,7 @@
             var thumbImg = document.createElement('img');
             thumbImg.src = item.imageUrl;
             thumbImg.alt = item.title;
-            thumbImg.className = 'w-full h-full object-cover group-hover:scale-105 transition-transform duration-500';
+            thumbImg.className = (item.imageClass || 'w-full h-full object-cover') + ' group-hover:scale-105 transition-transform duration-500';
             thumbImg.addEventListener('error', function () {
               renderGalleryImageFallback(thumbBox, item.tag);
             });
