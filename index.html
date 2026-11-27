@@ -488,7 +488,7 @@
         >
           <div
             id="relation-stage"
-            class="relative min-w-[540px] sm:min-w-0 w-full h-[540px] sm:h-[580px] overflow-hidden"
+            class="relative min-w-[640px] sm:min-w-0 w-full h-[620px] sm:h-[600px] overflow-hidden"
           >
             <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
               <div class="w-56 h-56 sm:w-64 sm:h-64 rounded-full border border-gold/10"></div>
@@ -1558,8 +1558,11 @@
           return { item: item, index: index, angleRad: angleRad, px: px, py: py };
         });
 
+        var placedLabelCoords = [];
+
         peerCoords.forEach(function (entry) {
           var item = entry.item;
+          var index = entry.index;
           var angleRad = entry.angleRad;
           var px = entry.px;
           var py = entry.py;
@@ -1633,30 +1636,52 @@
 
           var hasAnyLabel = item.bidirectional ? Boolean(item.label) : Boolean(item.label || item.reverseLabel);
           if (hasAnyLabel) {
-            // 標籤放在中段偏內側，避免靠近周圍頭像氣泡造成遮蔽
-            var labelRatio = totalPeers >= 8 ? 0.45 : 0.48;
+            // 採用內／中／外三段錯落比例，讓相鄰關係氣泡前後錯開不堆疊
+            var staggerRatios = totalPeers >= 7 ? [0.38, 0.58, 0.46, 0.64] : [0.44, 0.56];
+            var labelRatio = staggerRatios[index % staggerRatios.length];
             var midX = cx + (px - cx) * labelRatio;
             var midY = cy + (py - cy) * labelRatio;
 
-            // 檢查與任何頭像氣泡（含中央與周圍所有節點）是否過近；若過近則往連線中點方向拉回
-            for (var k = 0; k < 4; k++) {
-              var tooClose = false;
-              var dCenter = Math.hypot(midX - cx, midY - cy);
-              if (dCenter < 11.5) {
-                tooClose = true;
-              }
+            // 若與中央氣泡、周圍頭像氣泡或已放置的標籤過近，嘗試錯落候選位置
+            var candidateRatios = [labelRatio, 0.36, 0.52, 0.62, 0.42, 0.68];
+            for (var cIdx = 0; cIdx < candidateRatios.length; cIdx++) {
+              var testR = candidateRatios[cIdx];
+              var tx = cx + (px - cx) * testR;
+              var ty = cy + (py - cy) * testR;
+
+              // 避開中央氣泡（含下方「檔案」按鈕區域）
+              if (Math.hypot(tx - cx, ty - (cy + 2)) < 12.5) continue;
+
+              // 避開所有周圍頭像氣泡
+              var hitsPeer = false;
               for (var pIdx = 0; pIdx < peerCoords.length; pIdx++) {
                 var pc = peerCoords[pIdx];
-                if (Math.hypot(midX - pc.px, midY - pc.py) < 11.5) {
-                  tooClose = true;
+                if (Math.hypot(tx - pc.px, ty - pc.py) < 11.5) {
+                  hitsPeer = true;
                   break;
                 }
               }
-              if (!tooClose) break;
-              labelRatio = (labelRatio > 0.48) ? (labelRatio - 0.05) : (labelRatio + 0.04);
-              midX = cx + (px - cx) * labelRatio;
-              midY = cy + (py - cy) * labelRatio;
+              if (hitsPeer) continue;
+
+              // 避開已放置的關係文字氣泡（考慮橫向寬度）
+              var hitsLabel = false;
+              for (var lIdx = 0; lIdx < placedLabelCoords.length; lIdx++) {
+                var pl = placedLabelCoords[lIdx];
+                var dxNorm = (tx - pl.x) * 0.72;
+                var dyNorm = (ty - pl.y) * 1.35;
+                if (Math.hypot(dxNorm, dyNorm) < 9.5) {
+                  hitsLabel = true;
+                  break;
+                }
+              }
+              if (hitsLabel) continue;
+
+              midX = tx;
+              midY = ty;
+              break;
             }
+
+            placedLabelCoords.push({ x: midX, y: midY });
 
             var labelEl = document.createElement('div');
             labelEl.style.left = midX + '%';
@@ -1855,7 +1880,6 @@
       ];
 
       var relatedArticlesList = [
-
         {
           title: '數學作業',
           note: '關聯篇章',
