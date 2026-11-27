@@ -341,10 +341,11 @@
           <span class="text-sm sm:text-base font-medium tracking-[0.25em]">八幡組</span>
         </button>
 
-        <nav aria-label="章節導覽" class="flex items-center gap-4 sm:gap-8 text-xs sm:text-sm tracking-[0.2em] text-[#C8C0B4]">
+        <nav aria-label="章節導覽" class="flex items-center gap-3 sm:gap-7 text-xs sm:text-sm tracking-[0.18em] text-[#C8C0B4]">
           <a href="#section-creed" class="hover:text-gold transition-colors py-1">綱領</a>
           <a href="#section-history" class="hover:text-gold transition-colors py-1">沿革</a>
           <a href="#section-relations" class="hover:text-gold transition-colors py-1">人物關關係圖</a>
+          <a href="#section-gallery" class="hover:text-gold transition-colors py-1">画廊</a>
         </nav>
 
         <button
@@ -513,6 +514,56 @@
       </div>
     </section>
 
+    <!-- =========================================================================
+         画廊・記録區 (#section-gallery)：位於人物氣泡下方，橫向單排滑動式陳列
+         ========================================================================= -->
+    <section id="section-gallery" class="scroll-mt-20 max-w-4xl mx-auto px-4 sm:px-6 mt-16 sm:mt-24">
+      <div class="text-center mb-8 sm:mb-10">
+        <p class="text-[10px] sm:text-xs tracking-[0.4em] text-gold/75 uppercase mb-1.5">GALLERY &amp; CHRONICLES</p>
+        <h2 class="text-xl sm:text-2xl font-semibold tracking-[0.3em] pl-[0.3em] text-gold">画廊・記録</h2>
+        <p class="text-[11px] sm:text-xs tracking-[0.16em] text-[#9A9287] mt-2">
+          橫向滑動瀏覽圖集與關聯文章；點擊單張卡片檢視大圖、說明與外部文章連結
+        </p>
+      </div>
+
+      <div class="border border-gold/30 rounded bg-ink-card/75 p-4 sm:p-7 relative">
+        <span class="absolute top-2 left-2 w-3 h-3 border-t border-l border-gold/55 pointer-events-none"></span>
+        <span class="absolute top-2 right-2 w-3 h-3 border-t border-r border-gold/55 pointer-events-none"></span>
+        <span class="absolute bottom-2 left-2 w-3 h-3 border-b border-l border-gold/55 pointer-events-none"></span>
+        <span class="absolute bottom-2 right-2 w-3 h-3 border-b border-r border-gold/55 pointer-events-none"></span>
+
+        <div class="flex items-center justify-between mb-4">
+          <span class="text-[10px] sm:text-xs tracking-[0.28em] text-gold/80">── 収蔵一覧 ──</span>
+          <div class="flex items-center gap-2">
+            <button
+              id="gallery-prev-btn"
+              type="button"
+              aria-label="向左滑動"
+              class="w-8 h-8 rounded-full border border-gold/40 text-gold hover:bg-gold/15 hover:border-gold flex items-center justify-center text-xs transition-colors cursor-pointer"
+            >
+              ‹
+            </button>
+            <button
+              id="gallery-next-btn"
+              type="button"
+              aria-label="向右滑動"
+              class="w-8 h-8 rounded-full border border-gold/40 text-gold hover:bg-gold/15 hover:border-gold flex items-center justify-center text-xs transition-colors cursor-pointer"
+            >
+              ›
+            </button>
+          </div>
+        </div>
+
+        <!-- 橫向單排滑動容器 -->
+        <div
+          id="gallery-track"
+          role="list"
+          aria-label="画廊橫向滑動列表"
+          class="flex flex-nowrap gap-4 sm:gap-5 overflow-x-auto snap-x snap-mandatory pb-3 scroll-smooth"
+        ></div>
+      </div>
+    </section>
+
   </div>
 
   <!-- =========================================================================
@@ -599,6 +650,66 @@
             ></div>
           </div>
 
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       第四層：画廊放大檢視與關聯文章彈窗 (#gallery-overlay)
+       ========================================================================= -->
+  <div
+    id="gallery-overlay"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="gallery-modal-title"
+    class="hidden fixed inset-0 z-[85] bg-ink/90 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 md:p-8 opacity-0 transition-opacity duration-300"
+  >
+    <div
+      id="gallery-panel"
+      class="relative w-full max-w-4xl max-h-[90dvh] overflow-y-auto washi-bg border border-gold/50 rounded shadow-[0_24px_80px_rgba(0,0,0,0.88)] translate-y-4 opacity-0 transition-all duration-300"
+    >
+      <div class="sticky top-0 z-20 flex items-center justify-between px-5 py-3.5 sm:px-7 sm:py-4 bg-ink/95 backdrop-blur-md border-b border-gold/25">
+        <div class="flex items-center gap-2.5">
+          <span class="w-2 h-2 rotate-45 border border-gold"></span>
+          <span class="text-[11px] sm:text-xs tracking-[0.32em] text-gold/85 uppercase">GALLERY ARCHIVE</span>
+        </div>
+
+        <button
+          id="close-gallery-btn"
+          type="button"
+          class="px-3.5 py-1 text-xs tracking-[0.22em] text-gold border border-gold/45 rounded hover:bg-gold/15 hover:border-gold transition-all cursor-pointer"
+        >
+          關閉檢視
+        </button>
+      </div>
+
+      <div class="p-5 sm:p-7 md:p-8 flex flex-col gap-6">
+        <!-- 放大圖片顯示區 -->
+        <div
+          id="gallery-modal-image-box"
+          class="w-full min-h-[240px] sm:min-h-[340px] max-h-[54dvh] rounded bg-ink/90 border border-gold/30 flex flex-col items-center justify-center p-3 overflow-hidden relative"
+        ></div>
+
+        <!-- 內置說明區（標題、文字說明、外接連結） -->
+        <div class="border-t border-gold/25 pt-5 flex flex-col gap-4">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <h3
+              id="gallery-modal-title"
+              class="text-lg sm:text-2xl font-semibold tracking-[0.22em] text-[#F5F1E8]"
+            ></h3>
+            <span
+              id="gallery-modal-tag"
+              class="px-2.5 py-0.5 text-[10px] sm:text-xs tracking-[0.2em] text-gold bg-gold/10 border border-gold/35 rounded-sm"
+            ></span>
+          </div>
+
+          <p
+            id="gallery-modal-desc"
+            class="text-xs sm:text-sm leading-[1.95] tracking-[0.12em] text-[#DFD8CD] whitespace-pre-line bg-ink/75 border border-gold/20 rounded p-4 sm:p-5"
+          ></p>
+
+          <div id="gallery-modal-links" class="flex flex-wrap items-center gap-3 pt-1"></div>
         </div>
       </div>
     </div>
@@ -857,7 +968,7 @@
           isPreCircled: true,
           age: '65歲',
           height: '160公分',
-          fullBodyUrl: '',
+          fullBodyUrl: './may111.png',
           bio: '橫濱著名的餐廳「黑龍酒樓」的經營者，同時也是八幡組自前朝山和會以來的幹部。外人看著和氣，但她卻是情報收集的能手。\n\n橫濱華人家族應家的現任掌權者，做的一手好菜。對於活躍的小輩們保持著默默觀望守護的態度，必要時總會提供舞台供他們表現。'
         },
         {
@@ -966,7 +1077,16 @@
         { source: 'byakushi', target: 'lin', label: '捉摸不透', bidirectional: false },
         { source: 'koubai', target: 'nagi', label: '照顧', bidirectional: false },
         { source: 'nagi', target: 'koubai', label: '敬重的長輩', bidirectional: false },
-        { source: 'nagi', target: 'rui', label: '敬重的長輩', bidirectional: false }
+        { source: 'nagi', target: 'rui', label: '敬重的長輩', bidirectional: false },
+        { source: 'lin', target: 'nagi', label: '有趣的人', bidirectional: false },
+        { source: 'lin', target: 'kuon', label: '就像種子選手呢', bidirectional: false },
+        { source: 'kazuki', target: 'kana', label: '大姐頭喜歡酒店小姐嗎?', bidirectional: false },
+        { source: 'kana', target: 'kazuki', label: '笨蛋嗎', bidirectional: false },
+        { source: 'mimiko', target: 'tsubasa', label: '白癡', bidirectional: false },
+        { source: 'tsubasa', target: 'mimiko', label: '瘋子', bidirectional: false },
+        { source: 'subaru', target: 'mimiko', label: '風險', bidirectional: false },
+        { source: 'subaru', target: 'tsubasa', label: '風險', bidirectional: false },
+        { source: 'mimiko', target: 'kana', label: '電波不合', bidirectional: true }
       ];
 
       var activeCenterId = 'nagi';
@@ -1463,8 +1583,279 @@
         }
       });
 
+      // =========================================================================
+      // 画廊・記録（圖片與關聯文章資料陣列）
+      // 日後新增項目只需在 galleryItems 中複製一筆物件並填入 imageUrl、title、description 與 links 即可
+      // =========================================================================
+      var galleryItems = [
+        {
+          id: 'gallery-01',
+          tag: '挿絵・関連文章',
+          title: '還是找點別的樂子比較好',
+          subtitle: '繪｜秋柴　文｜然然',
+          imageUrl: '',
+          description: '收錄於八幡組史錄之視覺插畫與關聯短篇。
+（將 imageUrl 填入圖片檔名如 ./art01.png 即可顯示預覽圖與放大原圖。）',
+          links: [
+            {
+              label: '閱讀關聯文章：《還是找點別的樂子比較好》',
+              url: 'https://telegra.ph/%E9%82%84%E6%98%AF%E6%89%BE%E9%BB%9E%E5%88%A5%E7%9A%84%E6%A8%82%E5%AD%90%E6%AF%94%E8%BC%83%E5%A5%BD-03-31'
+            }
+          ]
+        },
+        {
+          id: 'gallery-02',
+          tag: '関連文章',
+          title: '數學作業',
+          subtitle: '凪與小泉一樹・初遇篇',
+          imageUrl: '',
+          description: '2020年左右，約17歲的凪協助應紅梅處理違法毒品事件，並於事件中正式收編第一位手下小泉一樹的關聯故事。',
+          links: [
+            {
+              label: '閱讀關聯文章：《數學作業》',
+              url: 'https://telegra.ph/%E6%95%B8%E5%AD%B8%E4%BD%9C%E6%A5%AD-11-24'
+            }
+          ]
+        },
+        {
+          id: 'gallery-03',
+          tag: '関連文章',
+          title: '意外救援',
+          subtitle: '凪與祈本秀太・結識篇',
+          imageUrl: '',
+          description: '2022年，凪與現役落語家祈本秀太結下孽緣的開端故事。',
+          links: [
+            {
+              label: '閱讀關聯文章：《意外救援》',
+              url: 'https://telegra.ph/%E6%84%8F%E5%A4%96%E6%95%91%E6%8F%B4-11-21'
+            }
+          ]
+        },
+        {
+          id: 'gallery-04',
+          tag: '関連文章',
+          title: '定位器',
+          subtitle: '凪與宇佐玄・羈絆篇',
+          imageUrl: '',
+          description: '2025–2026年，宇佐玄改造寵物定位項圈追蹤凪，正式踏入她身邊協助的關聯故事。',
+          links: [
+            {
+              label: '閱讀關聯文章：《定位器》',
+              url: 'https://telegra.ph/%E5%AE%9A%E4%BD%8D%E5%99%A8-11-20'
+            }
+          ]
+        },
+        {
+          id: 'gallery-05',
+          tag: '日常記録',
+          title: '憶往昔／餵食',
+          subtitle: '文｜嶙光',
+          imageUrl: '',
+          description: '八幡組日常番外篇章收錄。',
+          links: [
+            {
+              label: '閱讀《憶往昔》',
+              url: 'https://paste.plurk.com/show/5pOuHfx2n66jUpiFxVS5/?from_app=1'
+            },
+            {
+              label: '閱讀《餵食》',
+              url: 'https://paste.plurk.com/show/CZZKB9S3bzXFGU6Wc2S2/?from_app=1'
+            }
+          ]
+        }
+      ];
+
+      var galleryTrack = document.getElementById('gallery-track');
+      var galleryPrevBtn = document.getElementById('gallery-prev-btn');
+      var galleryNextBtn = document.getElementById('gallery-next-btn');
+      var galleryOverlay = document.getElementById('gallery-overlay');
+      var galleryPanel = document.getElementById('gallery-panel');
+      var closeGalleryBtn = document.getElementById('close-gallery-btn');
+      var galleryModalImageBox = document.getElementById('gallery-modal-image-box');
+      var galleryModalTitle = document.getElementById('gallery-modal-title');
+      var galleryModalTag = document.getElementById('gallery-modal-tag');
+      var galleryModalDesc = document.getElementById('gallery-modal-desc');
+      var galleryModalLinks = document.getElementById('gallery-modal-links');
+
+      function renderGalleryImageFallback(container, labelText) {
+        container.innerHTML = '';
+        var diamond = document.createElement('span');
+        diamond.className = 'w-3 h-3 rotate-45 border border-gold/45 mb-2.5';
+        var txt = document.createElement('p');
+        txt.className = 'text-xs tracking-[0.22em] text-gold/80';
+        txt.textContent = labelText || '画像未登録';
+        var sub = document.createElement('p');
+        sub.className = 'text-[10px] tracking-[0.14em] text-[#7E776D] mt-1';
+        sub.textContent = '（點擊可檢視說明與關聯文章連結）';
+        container.appendChild(diamond);
+        container.appendChild(txt);
+        container.appendChild(sub);
+      }
+
+      function openGalleryModal(item) {
+        if (!item || !galleryOverlay || !galleryPanel) return;
+
+        if (galleryModalTitle) galleryModalTitle.textContent = item.title || '';
+        if (galleryModalTag) galleryModalTag.textContent = item.tag || '画廊';
+        if (galleryModalDesc) galleryModalDesc.textContent = item.description || '';
+
+        if (galleryModalImageBox) {
+          galleryModalImageBox.innerHTML = '';
+          if (item.imageUrl) {
+            var bigImg = document.createElement('img');
+            bigImg.src = item.imageUrl;
+            bigImg.alt = item.title || '画廊圖片';
+            bigImg.className = 'w-full h-full max-h-[50dvh] object-contain rounded';
+            bigImg.addEventListener('error', function () {
+              renderGalleryImageFallback(galleryModalImageBox, item.title);
+            });
+            galleryModalImageBox.appendChild(bigImg);
+          } else {
+            renderGalleryImageFallback(galleryModalImageBox, item.title);
+          }
+        }
+
+        if (galleryModalLinks) {
+          galleryModalLinks.innerHTML = '';
+          if (item.links && item.links.length > 0) {
+            item.links.forEach(function (lnk) {
+              if (!lnk.url) return;
+              var a = document.createElement('a');
+              a.href = lnk.url;
+              a.target = '_blank';
+              a.rel = 'noopener noreferrer';
+              a.className =
+                'inline-flex items-center gap-2 px-4 py-2 text-xs tracking-[0.16em] text-ink bg-gold hover:bg-gold-light font-medium rounded transition-colors shadow-md';
+              a.innerHTML = '<span>' + (lnk.label || '前往關聯連結') + '</span><span aria-hidden="true">↗</span>';
+              galleryModalLinks.appendChild(a);
+            });
+          }
+        }
+
+        galleryOverlay.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+
+        requestAnimationFrame(function () {
+          galleryOverlay.classList.remove('opacity-0');
+          galleryOverlay.classList.add('opacity-100');
+          galleryPanel.classList.remove('translate-y-4', 'opacity-0');
+          galleryPanel.classList.add('translate-y-0', 'opacity-100');
+        });
+      }
+
+      function closeGalleryModal() {
+        if (!galleryOverlay || !galleryPanel) return;
+        galleryOverlay.classList.remove('opacity-100');
+        galleryOverlay.classList.add('opacity-0');
+        galleryPanel.classList.remove('translate-y-0', 'opacity-100');
+        galleryPanel.classList.add('translate-y-4', 'opacity-0');
+
+        setTimeout(function () {
+          galleryOverlay.classList.add('hidden');
+          document.body.style.overflow = '';
+        }, 320);
+      }
+
+      if (closeGalleryBtn) {
+        closeGalleryBtn.addEventListener('click', closeGalleryModal);
+      }
+
+      if (galleryOverlay) {
+        galleryOverlay.addEventListener('click', function (e) {
+          if (e.target === galleryOverlay) {
+            closeGalleryModal();
+          }
+        });
+      }
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && galleryOverlay && !galleryOverlay.classList.contains('hidden')) {
+          closeGalleryModal();
+        }
+      });
+
+      if (galleryPrevBtn && galleryTrack) {
+        galleryPrevBtn.addEventListener('click', function () {
+          galleryTrack.scrollBy({ left: -280, behavior: 'smooth' });
+        });
+      }
+
+      if (galleryNextBtn && galleryTrack) {
+        galleryNextBtn.addEventListener('click', function () {
+          galleryTrack.scrollBy({ left: 280, behavior: 'smooth' });
+        });
+      }
+
+      function renderGalleryTrack() {
+        if (!galleryTrack) return;
+        galleryTrack.innerHTML = '';
+
+        galleryItems.forEach(function (item) {
+          var card = document.createElement('button');
+          card.type = 'button';
+          card.setAttribute('role', 'listitem');
+          card.setAttribute('aria-label', '放大檢視：' + item.title);
+          card.className =
+            'snap-start shrink-0 w-[230px] sm:w-[260px] rounded bg-ink/85 border border-gold/30 hover:border-gold overflow-hidden flex flex-col text-left transition-all duration-300 hover:-translate-y-0.5 shadow-lg cursor-pointer group';
+
+          var thumbBox = document.createElement('div');
+          thumbBox.className =
+            'w-full h-36 sm:h-40 bg-[#080C0E] border-b border-gold/20 flex flex-col items-center justify-center p-3 overflow-hidden relative';
+
+          if (item.imageUrl) {
+            var thumbImg = document.createElement('img');
+            thumbImg.src = item.imageUrl;
+            thumbImg.alt = item.title;
+            thumbImg.className = 'w-full h-full object-cover group-hover:scale-105 transition-transform duration-500';
+            thumbImg.addEventListener('error', function () {
+              renderGalleryImageFallback(thumbBox, item.tag);
+            });
+            thumbBox.appendChild(thumbImg);
+          } else {
+            renderGalleryImageFallback(thumbBox, item.tag);
+          }
+
+          var metaBox = document.createElement('div');
+          metaBox.className = 'p-3.5 flex-1 flex flex-col justify-between gap-2';
+
+          var topMeta = document.createElement('div');
+          var tagSpan = document.createElement('span');
+          tagSpan.className = 'inline-block text-[10px] tracking-[0.18em] text-gold/85 mb-1';
+          tagSpan.textContent = item.tag;
+
+          var titleEl = document.createElement('h3');
+          titleEl.className = 'text-xs sm:text-sm font-medium tracking-[0.14em] text-[#F0ECE3] group-hover:text-gold transition-colors line-clamp-1';
+          titleEl.textContent = item.title;
+
+          var subEl = document.createElement('p');
+          subEl.className = 'text-[10px] sm:text-[11px] tracking-[0.1em] text-[#9A9287] mt-1 line-clamp-1';
+          subEl.textContent = item.subtitle || '';
+
+          topMeta.appendChild(tagSpan);
+          topMeta.appendChild(titleEl);
+          if (item.subtitle) topMeta.appendChild(subEl);
+
+          var actionHint = document.createElement('div');
+          actionHint.className = 'pt-2 border-t border-gold/15 flex items-center justify-between text-[10px] tracking-[0.18em] text-gold/75 group-hover:text-gold';
+          actionHint.innerHTML = '<span>拡大・詳細</span><span>＋</span>';
+
+          metaBox.appendChild(topMeta);
+          metaBox.appendChild(actionHint);
+
+          card.appendChild(thumbBox);
+          card.appendChild(metaBox);
+
+          card.addEventListener('click', function () {
+            openGalleryModal(item);
+          });
+
+          galleryTrack.appendChild(card);
+        });
+      }
+
       renderRelationStage();
       renderAvatarLinks();
+      renderGalleryTrack();
     });
   </script>
 </body>
