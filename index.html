@@ -1054,6 +1054,94 @@
           height: '176公分',
           fullBodyUrl: './112202.png',
           bio: '前會計師，因頂罪入獄。在獄中與久遠結識後受對方幫助而提前出獄。懷抱一定的感謝之情，加之入獄後不好找工作而加入了八幡組。打架其實是在監獄中跟加入組裡才學的，跟冷漠的外表不同，實際上很照顧小孩。\n\n因為職業關係，對數字敏感，凡事精密計較得失與風險，認為久遠找來美美子與翼是高風險的行為。\n\n因為報恩因素站在久遠一側，但同樣也在觀察八幡凪。'
+        },
+        // =====================================================================
+        // 特殊關係人物（非八幡組組員／僅於關係圖連線呈現，不展開個人檔案圖卡）
+        // 在物件中加入 `nodeOnly: true, noProfile: true` 即可啟用此模式
+        // =====================================================================
+        {
+          id: 'shuta',
+          name: '祈本 秀太',
+          shortName: '秀太',
+          role: '外部關係者',
+          avatarUrl: './show.png',
+          isPreCircled: true,
+          nodeOnly: true,
+          noProfile: true,
+          age: '26歲',
+          height: '176公分',
+          fullBodyUrl: '',
+          bio: ''
+        },
+        {
+          id: 'ayame',
+          name: '鳶飛 菖蒲',
+          shortName: '菖蒲',
+          role: '外部關係者',
+          avatarUrl: './sho.png',
+          isPreCircled: true,
+          nodeOnly: true,
+          noProfile: true,
+          age: '22歲',
+          height: '154公分',
+          fullBodyUrl: '',
+          bio: ''
+        },
+        {
+          id: 'junpei',
+          name: '角花 淳平',
+          shortName: '淳平',
+          role: '外部關係者',
+          avatarUrl: './arashi.png',
+          isPreCircled: true,
+          nodeOnly: true,
+          noProfile: true,
+          age: '23歲',
+          height: '171公分',
+          fullBodyUrl: '',
+          bio: ''
+        },
+        {
+          id: 'satsuki',
+          name: '五百木臯月',
+          shortName: '臯月',
+          role: '外部關係者',
+          avatarUrl: './500.png',
+          isPreCircled: true,
+          nodeOnly: true,
+          noProfile: true,
+          age: '未填寫',
+          height: '未填寫',
+          fullBodyUrl: '',
+          bio: ''
+        },
+        {
+          id: 'miki',
+          name: '相馬未紀',
+          shortName: '未紀',
+          role: '外部關係者',
+          avatarUrl: './miki.png',
+          isPreCircled: true,
+          nodeOnly: true,
+          noProfile: true,
+          age: '未填寫',
+          height: '未填寫',
+          fullBodyUrl: '',
+          bio: ''
+        },
+        {
+          id: 'zenmon',
+          name: '源禪門',
+          shortName: '禪門',
+          role: '外部關係者',
+          avatarUrl: './kennshi.png',
+          isPreCircled: true,
+          nodeOnly: true,
+          noProfile: true,
+          age: '未填寫',
+          height: '未填寫',
+          fullBodyUrl: '',
+          bio: ''
         }
       ];
 
@@ -1086,7 +1174,14 @@
         { source: 'tsubasa', target: 'mimiko', label: '瘋子', bidirectional: false },
         { source: 'subaru', target: 'mimiko', label: '風險', bidirectional: false },
         { source: 'subaru', target: 'tsubasa', label: '風險', bidirectional: false },
-        { source: 'mimiko', target: 'kana', label: '電波不合', bidirectional: true }
+        { source: 'mimiko', target: 'kana', label: '電波不合', bidirectional: true },
+        { source: 'nagi', target: 'shuta', label: '惡友', bidirectional: true },
+        { source: 'ryuji', target: 'shuta', label: '好友的弟子', bidirectional: false },
+        { source: 'nagi', target: 'ayame', label: '友人', bidirectional: true },
+        { source: 'zenmon', target: 'lin', label: '合作關係', bidirectional: true },
+        { source: 'rui', target: 'satsuki', label: '工作夥伴', bidirectional: true },
+        { source: 'rui', target: 'miki', label: '工作夥伴', bidirectional: true },
+        { source: 'junpei', target: 'nagi', label: '高中同學', bidirectional: true }
       ];
 
       var activeCenterId = 'nagi';
@@ -1123,7 +1218,7 @@
 
       function openCharacterProfile(charId) {
         var char = getCharacterById(charId);
-        if (!char || !profileOverlay || !profilePanel) return;
+        if (!char || char.noProfile || !profileOverlay || !profilePanel) return;
 
         if (profileRoleEl) profileRoleEl.textContent = char.role || '';
         if (profileNameEl) profileNameEl.textContent = char.name || '';
@@ -1308,6 +1403,13 @@
       }
 
       function createCenterProfileButton(char) {
+        if (char.noProfile) {
+          var badge = document.createElement('span');
+          badge.className =
+            'mt-2 px-2.5 py-0.5 text-[10px] tracking-[0.18em] text-[#9A9287] bg-ink/90 border border-gold/30 rounded-full pointer-events-none';
+          badge.textContent = '組外關係者';
+          return badge;
+        }
         var docBtn = document.createElement('button');
         docBtn.type = 'button';
         docBtn.setAttribute('aria-label', '開啟 ' + char.name + ' 個人檔案');
@@ -1519,7 +1621,7 @@
         if (!avatarLinksContainer) return;
         avatarLinksContainer.innerHTML = '';
 
-        characters.forEach(function (char) {
+        characters.filter(function (c) { return !c.nodeOnly; }).forEach(function (char) {
           var isCenter = char.id === activeCenterId;
 
           var itemWrapper = document.createElement('div');
