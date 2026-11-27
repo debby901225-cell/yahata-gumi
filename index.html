@@ -471,32 +471,48 @@
         <span class="absolute bottom-2 left-2 w-3 h-3 border-b border-l border-gold/55 pointer-events-none"></span>
         <span class="absolute bottom-2 right-2 w-3 h-3 border-b border-r border-gold/55 pointer-events-none"></span>
 
-        <div
-          id="relation-stage"
-          class="relative w-full h-[600px] sm:h-[580px] rounded bg-ink/80 border border-gold/15 overflow-hidden mb-7 select-none"
-        >
-          <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div class="w-48 h-48 sm:w-64 sm:h-64 rounded-full border border-gold/10"></div>
-            <div class="absolute w-80 h-80 sm:w-[26rem] sm:h-[26rem] rounded-full border border-dashed border-gold/10"></div>
-          </div>
-
-          <svg
-            id="relation-lines-svg"
-            viewBox="0 0 100 100"
-            preserveAspectRatio="none"
-            class="absolute inset-0 w-full h-full z-10 pointer-events-none"
+        <div class="flex sm:hidden items-center justify-between gap-2 mb-2.5 text-[10px] tracking-[0.14em] text-[#9A9287]">
+          <span>← 可左右滑動平移關係圖 →</span>
+          <button
+            id="relation-recenter-btn"
+            type="button"
+            class="px-2.5 py-0.5 rounded border border-gold/40 text-gold bg-ink/90 cursor-pointer"
           >
-            <defs>
-              <marker id="arrow-gold" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="4.2" markerHeight="4.2" orient="auto">
-                <path d="M 0 1.5 L 8.5 5 L 0 8.5 z" fill="#B38E63" />
-              </marker>
-              <marker id="arrow-silver" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="4.2" markerHeight="4.2" orient="auto">
-                <path d="M 0 1.5 L 8.5 5 L 0 8.5 z" fill="#C8B9A6" />
-              </marker>
-            </defs>
-          </svg>
+            置中視角
+          </button>
+        </div>
 
-          <div id="relation-nodes-layer" class="absolute inset-0 w-full h-full"></div>
+        <div
+          id="relation-stage-scroll"
+          class="relative w-full overflow-x-auto sm:overflow-hidden rounded bg-ink/80 border border-gold/15 mb-7 select-none"
+        >
+          <div
+            id="relation-stage"
+            class="relative min-w-[540px] sm:min-w-0 w-full h-[540px] sm:h-[580px] overflow-hidden"
+          >
+            <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div class="w-56 h-56 sm:w-64 sm:h-64 rounded-full border border-gold/10"></div>
+              <div class="absolute w-96 h-96 sm:w-[26rem] sm:h-[26rem] rounded-full border border-dashed border-gold/10"></div>
+            </div>
+
+            <svg
+              id="relation-lines-svg"
+              viewBox="0 0 100 100"
+              preserveAspectRatio="none"
+              class="absolute inset-0 w-full h-full z-10 pointer-events-none"
+            >
+              <defs>
+                <marker id="arrow-gold" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="4.2" markerHeight="4.2" orient="auto">
+                  <path d="M 0 1.5 L 8.5 5 L 0 8.5 z" fill="#B38E63" />
+                </marker>
+                <marker id="arrow-silver" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="4.2" markerHeight="4.2" orient="auto">
+                  <path d="M 0 1.5 L 8.5 5 L 0 8.5 z" fill="#C8B9A6" />
+                </marker>
+              </defs>
+            </svg>
+
+            <div id="relation-nodes-layer" class="absolute inset-0 w-full h-full"></div>
+          </div>
         </div>
 
         <div class="flex items-center gap-3 mb-6">
@@ -1512,19 +1528,19 @@
         var stageRect = linesSvg.getBoundingClientRect();
         var aspectRatio = (stageRect.width && stageRect.height) ? (stageRect.width / stageRect.height) : 1;
 
-        var isMobileViewport = window.innerWidth < 640;
         var totalPeers = connectedPeers.length;
         var cx = 50;
-        var cy = totalPeers === 1 ? 57 : (isMobileViewport && totalPeers >= 8 ? 50 : 48);
+        var cy = totalPeers === 1 ? 57 : 49;
 
-        var bubbleSizeClass = 'w-[72px] h-[72px] sm:w-24 sm:h-24';
+        var bubbleSizeClass = 'w-[68px] h-[68px] sm:w-24 sm:h-24';
         if (totalPeers >= 8) {
-          bubbleSizeClass = 'w-[56px] h-[56px] sm:w-20 sm:h-20';
+          bubbleSizeClass = 'w-[60px] h-[60px] sm:w-20 sm:h-20';
         } else if (totalPeers >= 5) {
           bubbleSizeClass = 'w-[64px] h-[64px] sm:w-24 sm:h-24';
         }
 
-        connectedPeers.forEach(function (item, index) {
+        // 先計算所有周圍節點座標，供標籤做避讓檢測（確保標籤絕不蓋住頭像氣泡）
+        var peerCoords = connectedPeers.map(function (item, index) {
           var angleRad;
           if (totalPeers === 1) {
             angleRad = -Math.PI / 2;
@@ -1534,16 +1550,19 @@
             angleRad = -Math.PI / 2 + (index * 2 * Math.PI) / totalPeers;
           }
 
-          var baseRx = totalPeers <= 2 ? 0 : (isMobileViewport ? (totalPeers >= 8 ? 35 : 34) : (totalPeers >= 5 ? 37 : 35));
-          var baseRy = totalPeers === 1 ? 37 : (isMobileViewport ? (totalPeers >= 8 ? 37 : 35) : (totalPeers >= 5 ? 36 : 35.5));
+          var rx = totalPeers <= 2 ? 0 : (totalPeers >= 8 ? 38 : 36);
+          var ry = totalPeers === 1 ? 37 : (totalPeers >= 8 ? 37.5 : 36);
 
-          // 節點較多時，交錯微調半徑避免相鄰氣泡與文字標籤擠在一起
-          var staggerFactor = (totalPeers >= 7 && index % 2 === 1) ? 0.86 : 1.0;
-          var radiusX = baseRx * staggerFactor;
-          var radiusY = baseRy * staggerFactor;
+          var px = cx + rx * Math.cos(angleRad);
+          var py = cy + ry * Math.sin(angleRad);
+          return { item: item, index: index, angleRad: angleRad, px: px, py: py };
+        });
 
-          var px = cx + radiusX * Math.cos(angleRad);
-          var py = cy + radiusY * Math.sin(angleRad);
+        peerCoords.forEach(function (entry) {
+          var item = entry.item;
+          var angleRad = entry.angleRad;
+          var px = entry.px;
+          var py = entry.py;
 
           var vx = px - cx;
           var vy = py - cy;
@@ -1614,11 +1633,31 @@
 
           var hasAnyLabel = item.bidirectional ? Boolean(item.label) : Boolean(item.label || item.reverseLabel);
           if (hasAnyLabel) {
-            var isHorizontal = Math.abs(Math.cos(angleRad)) > 0.85;
-            var isBottomSide = Math.sin(angleRad) > 0.25;
-            var labelRatio = (totalPeers >= 7 && index % 2 === 1) ? 0.64 : (isHorizontal ? 0.56 : (isBottomSide ? 0.60 : 0.53));
+            // 標籤放在中段偏內側，避免靠近周圍頭像氣泡造成遮蔽
+            var labelRatio = totalPeers >= 8 ? 0.45 : 0.48;
             var midX = cx + (px - cx) * labelRatio;
             var midY = cy + (py - cy) * labelRatio;
+
+            // 檢查與任何頭像氣泡（含中央與周圍所有節點）是否過近；若過近則往連線中點方向拉回
+            for (var k = 0; k < 4; k++) {
+              var tooClose = false;
+              var dCenter = Math.hypot(midX - cx, midY - cy);
+              if (dCenter < 11.5) {
+                tooClose = true;
+              }
+              for (var pIdx = 0; pIdx < peerCoords.length; pIdx++) {
+                var pc = peerCoords[pIdx];
+                if (Math.hypot(midX - pc.px, midY - pc.py) < 11.5) {
+                  tooClose = true;
+                  break;
+                }
+              }
+              if (!tooClose) break;
+              labelRatio = (labelRatio > 0.48) ? (labelRatio - 0.05) : (labelRatio + 0.04);
+              midX = cx + (px - cx) * labelRatio;
+              midY = cy + (py - cy) * labelRatio;
+            }
+
             var labelEl = document.createElement('div');
             labelEl.style.left = midX + '%';
             labelEl.style.top = midY + '%';
@@ -1630,23 +1669,23 @@
 
             if (item.bidirectional) {
               labelEl.className =
-                'absolute -translate-x-1/2 -translate-y-1/2 z-30 px-2 py-0.5 text-[9px] sm:text-xs tracking-[0.12em] text-gold bg-ink/95 border border-gold/70 rounded-full shadow-lg max-w-[118px] sm:max-w-[180px] truncate pointer-events-none';
+                'absolute -translate-x-1/2 -translate-y-1/2 z-20 px-2 py-0.5 text-[9.5px] sm:text-xs tracking-[0.12em] text-gold bg-ink/95 border border-gold/70 rounded-full shadow-lg max-w-[130px] sm:max-w-[180px] truncate pointer-events-none';
               labelEl.textContent = '⇄ ' + item.label;
             } else if (item.label && item.reverseLabel) {
               labelEl.className =
-                'absolute -translate-x-1/2 -translate-y-1/2 z-30 px-2 py-0.5 text-[8.5px] sm:text-[10px] tracking-[0.06em] text-gold bg-ink/95 border border-gold/70 rounded-lg shadow-lg max-w-[132px] sm:max-w-[205px] text-center pointer-events-none flex flex-col items-center gap-0.5 leading-tight';
+                'absolute -translate-x-1/2 -translate-y-1/2 z-20 px-2 py-0.5 text-[9px] sm:text-[10px] tracking-[0.06em] text-gold bg-ink/95 border border-gold/70 rounded-lg shadow-lg max-w-[140px] sm:max-w-[205px] text-center pointer-events-none flex flex-col items-center gap-0.5 leading-tight';
               labelEl.innerHTML =
                 '<span class="truncate max-w-full">' + centerChar.shortName + ' ' + arrowToPeer + ' ' + item.character.shortName + '：' + item.label + '</span>' +
                 '<span class="text-[#C8B9A6] truncate max-w-full">' + item.character.shortName + ' ' + arrowToCenter + ' ' + centerChar.shortName + '：' + item.reverseLabel + '</span>';
             } else if (item.label) {
               labelEl.className =
-                'absolute -translate-x-1/2 -translate-y-1/2 z-30 px-2 py-0.5 text-[9px] sm:text-xs tracking-[0.1em] text-gold bg-ink/95 border border-gold/70 rounded-full shadow-lg max-w-[132px] sm:max-w-[210px] truncate pointer-events-none';
+                'absolute -translate-x-1/2 -translate-y-1/2 z-20 px-2 py-0.5 text-[9.5px] sm:text-xs tracking-[0.1em] text-gold bg-ink/95 border border-gold/70 rounded-full shadow-lg max-w-[140px] sm:max-w-[210px] truncate pointer-events-none';
               labelEl.textContent = (visualDx < -0.15)
                 ? (item.character.shortName + ' ' + arrowToPeer + ' ' + centerChar.shortName + '：' + item.label)
                 : (centerChar.shortName + ' ' + arrowToPeer + ' ' + item.character.shortName + '：' + item.label);
             } else {
               labelEl.className =
-                'absolute -translate-x-1/2 -translate-y-1/2 z-30 px-2 py-0.5 text-[9px] sm:text-xs tracking-[0.1em] text-[#C8B9A6] bg-ink/95 border border-gold/60 rounded-full shadow-lg max-w-[132px] sm:max-w-[210px] truncate pointer-events-none';
+                'absolute -translate-x-1/2 -translate-y-1/2 z-20 px-2 py-0.5 text-[9.5px] sm:text-xs tracking-[0.1em] text-[#C8B9A6] bg-ink/95 border border-gold/60 rounded-full shadow-lg max-w-[140px] sm:max-w-[210px] truncate pointer-events-none';
               labelEl.textContent = (visualDx < -0.15)
                 ? (item.character.shortName + ' ' + arrowToCenter + ' ' + centerChar.shortName + '：' + item.reverseLabel)
                 : (centerChar.shortName + ' ' + arrowToCenter + ' ' + item.character.shortName + '：' + item.reverseLabel);
@@ -1661,7 +1700,7 @@
           peerBtn.style.top = py + '%';
           peerBtn.setAttribute('aria-label', '切換焦點至 ' + item.character.name);
           peerBtn.className =
-            'bubble-node absolute -translate-x-1/2 -translate-y-1/2 z-20 ' + bubbleSizeClass + ' rounded-full overflow-hidden bg-ink-light/95 border border-gold/60 hover:border-gold flex flex-col items-center justify-center p-1 text-center shadow-lg cursor-pointer group';
+            'bubble-node absolute -translate-x-1/2 -translate-y-1/2 z-30 ' + bubbleSizeClass + ' rounded-full overflow-hidden bg-ink-light/95 border border-gold/60 hover:border-gold flex flex-col items-center justify-center p-1 text-center shadow-lg cursor-pointer group';
 
           populateBubbleContent(peerBtn, item.character, false);
           peerBtn.addEventListener('click', function () {
@@ -1695,6 +1734,11 @@
             'absolute -translate-x-1/2 -translate-y-1/2 z-20 px-3.5 py-1 text-[11px] sm:text-xs tracking-[0.25em] text-[#8E877D] border border-gold/20 rounded-full bg-ink/80 whitespace-nowrap';
           emptyHint.textContent = '関係線未登録';
           nodesLayer.appendChild(emptyHint);
+        }
+
+        var scrollBox = document.getElementById('relation-stage-scroll');
+        if (scrollBox && scrollBox.scrollWidth > scrollBox.clientWidth) {
+          scrollBox.scrollLeft = Math.max(0, (scrollBox.scrollWidth - scrollBox.clientWidth) / 2);
         }
       }
 
@@ -1811,6 +1855,7 @@
       ];
 
       var relatedArticlesList = [
+
         {
           title: '數學作業',
           note: '關聯篇章',
@@ -2110,6 +2155,19 @@
           a.appendChild(leftBox);
           a.appendChild(arrowSpan);
           galleryArticlesListEl.appendChild(a);
+        });
+      }
+
+      var recenterBtn = document.getElementById('relation-recenter-btn');
+      if (recenterBtn) {
+        recenterBtn.addEventListener('click', function () {
+          var scrollBox = document.getElementById('relation-stage-scroll');
+          if (scrollBox) {
+            scrollBox.scrollTo({
+              left: Math.max(0, (scrollBox.scrollWidth - scrollBox.clientWidth) / 2),
+              behavior: 'smooth'
+            });
+          }
         });
       }
 
