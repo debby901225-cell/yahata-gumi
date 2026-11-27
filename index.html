@@ -488,7 +488,7 @@
         >
           <div
             id="relation-stage"
-            class="relative min-w-[640px] sm:min-w-0 w-full h-[620px] sm:h-[600px] overflow-hidden"
+            class="relative min-w-[680px] sm:min-w-0 w-full h-[640px] sm:h-[620px] overflow-hidden"
           >
             <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
               <div class="w-56 h-56 sm:w-64 sm:h-64 rounded-full border border-gold/10"></div>
@@ -1530,16 +1530,20 @@
 
         var totalPeers = connectedPeers.length;
         var cx = 50;
-        var cy = totalPeers === 1 ? 57 : 49;
+        var cy = totalPeers === 1 ? 56 : 46;
 
-        var bubbleSizeClass = 'w-[68px] h-[68px] sm:w-24 sm:h-24';
+        var bubbleSizeClass = 'w-[66px] h-[66px] sm:w-22 sm:h-22';
         if (totalPeers >= 8) {
-          bubbleSizeClass = 'w-[60px] h-[60px] sm:w-20 sm:h-20';
+          bubbleSizeClass = 'w-[58px] h-[58px] sm:w-20 sm:h-20';
         } else if (totalPeers >= 5) {
-          bubbleSizeClass = 'w-[64px] h-[64px] sm:w-24 sm:h-24';
+          bubbleSizeClass = 'w-[62px] h-[62px] sm:w-22 sm:h-22';
         }
 
-        // 先計算所有周圍節點座標，供標籤做避讓檢測（確保標籤絕不蓋住頭像氣泡）
+        // （1）線段分布長短有致：依文字長度與節點位置調配長短，字多的連線適度拉長，短／一般連線保持錯落
+        var baseLengths = totalPeers >= 7
+          ? [0.96, 0.84, 1.02, 0.86]
+          : [0.98, 0.87, 1.02, 0.89];
+
         var peerCoords = connectedPeers.map(function (item, index) {
           var angleRad;
           if (totalPeers === 1) {
@@ -1550,15 +1554,35 @@
             angleRad = -Math.PI / 2 + (index * 2 * Math.PI) / totalPeers;
           }
 
-          var rx = totalPeers <= 2 ? 0 : (totalPeers >= 8 ? 38 : 36);
-          var ry = totalPeers === 1 ? 37 : (totalPeers >= 8 ? 37.5 : 36);
+          var isTwoLineItem = !item.bidirectional && Boolean(item.label && item.reverseLabel);
+          var maxTextLen = Math.max((item.label || '').length, (item.reverseLabel || '').length);
+          var isHeavyLabel = isTwoLineItem || maxTextLen >= 6;
 
-          var px = cx + rx * Math.cos(angleRad);
-          var py = cy + ry * Math.sin(angleRad);
-          return { item: item, index: index, angleRad: angleRad, px: px, py: py };
+          var lenScale = totalPeers <= 2 ? 1 : baseLengths[index % baseLengths.length];
+          if (isHeavyLabel && totalPeers > 2) {
+            // 字較多的關係氣泡，將該連線適度拉長，拉開與鄰近線段的距離
+            lenScale = Math.min(1.13, Math.max(lenScale, 1.07));
+          }
+
+          var baseRingRx = totalPeers >= 8 ? 36.5 : 34.5;
+          var baseRingRy = totalPeers === 1 ? 35 : (totalPeers >= 8 ? 36 : 34.5);
+
+          var rawPx = cx + (totalPeers <= 2 ? 0 : baseRingRx * lenScale) * Math.cos(angleRad);
+          var rawPy = cy + (totalPeers === 1 ? 35 : baseRingRy * lenScale) * Math.sin(angleRad);
+
+          // 確保外側圓框始終留在畫布安全邊界內（x: 12~88, y: 12~88）
+          var px = Math.min(88, Math.max(12, rawPx));
+          var py = Math.min(88, Math.max(12, rawPy));
+
+          return {
+            item: item,
+            index: index,
+            angleRad: angleRad,
+            px: px,
+            py: py,
+            isHeavyLabel: isHeavyLabel
+          };
         });
-
-        var placedLabelCoords = [];
 
         peerCoords.forEach(function (entry) {
           var item = entry.item;
@@ -1566,6 +1590,7 @@
           var angleRad = entry.angleRad;
           var px = entry.px;
           var py = entry.py;
+          var isHeavyLabel = entry.isHeavyLabel;
 
           var vx = px - cx;
           var vy = py - cy;
@@ -1636,86 +1661,23 @@
 
           var hasAnyLabel = item.bidirectional ? Boolean(item.label) : Boolean(item.label || item.reverseLabel);
           if (hasAnyLabel) {
-            var isTwoLine = !item.bidirectional && Boolean(item.label && item.reverseLabel);
-            var halfW = isTwoLine ? 13.5 : (item.bidirectional ? 7.8 : 11.2);
-            var halfH = isTwoLine ? 4.4 : 2.8;
-
-            var staggerRatios = totalPeers >= 7 ? [0.37, 0.61, 0.48, 0.68] : [0.43, 0.57];
-            var baseR = staggerRatios[index % staggerRatios.length];
-            var perpSign = (index % 2 === 0) ? 1 : -1;
-
-            var candidates = [
-              { r: baseR, p: 0 },
-              { r: baseR, p: perpSign * 4.5 },
-              { r: baseR, p: -perpSign * 4.5 },
-              { r: 0.36, p: 0 },
-              { r: 0.62, p: 0 },
-              { r: 0.50, p: perpSign * 5.5 },
-              { r: 0.50, p: -perpSign * 5.5 },
-              { r: 0.68, p: perpSign * 3.5 },
-              { r: 0.68, p: -perpSign * 3.5 }
-            ];
-
-            var bestX = cx + (px - cx) * baseR;
-            var bestY = cy + (py - cy) * baseR;
-            var bestScore = Infinity;
-
-            for (var cIdx = 0; cIdx < candidates.length; cIdx++) {
-              var cand = candidates[cIdx];
-              var tx = cx + (px - cx) * cand.r + perpX * cand.p;
-              var ty = cy + (py - cy) * cand.r + perpY * cand.p;
-
-              // 保持在畫布安全邊界內
-              if (tx < 8 || tx > 92 || ty < 8 || ty > 92) continue;
-
-              var penalty = 0;
-
-              // 避開中央焦點氣泡與下方「檔案」按鈕
-              var dCenterX = Math.max(0, Math.abs(tx - cx) - (10.5 + halfW));
-              var dCenterY = Math.max(0, Math.abs(ty - (cy + 1.5)) - (12.0 + halfH));
-              if (dCenterX === 0 && dCenterY === 0) {
-                penalty += 500;
-              } else {
-                penalty += Math.max(0, 6 - Math.hypot(dCenterX, dCenterY)) * 8;
-              }
-
-              // 避開所有周圍頭像氣泡
-              for (var pIdx = 0; pIdx < peerCoords.length; pIdx++) {
-                var pc = peerCoords[pIdx];
-                var overlapPx = (8.8 + halfW) - Math.abs(tx - pc.px);
-                var overlapPy = (8.8 + halfH) - Math.abs(ty - pc.py);
-                if (overlapPx > 0 && overlapPy > 0) {
-                  penalty += (overlapPx * overlapPy) * 40 + 300;
-                }
-              }
-
-              // 避開已放置的關係文字氣泡（矩形交集面積懲罰）
-              for (var lIdx = 0; lIdx < placedLabelCoords.length; lIdx++) {
-                var pl = placedLabelCoords[lIdx];
-                var padX = 1.6;
-                var padY = 1.2;
-                var ovX = (halfW + pl.hw + padX) - Math.abs(tx - pl.x);
-                var ovY = (halfH + pl.hh + padY) - Math.abs(ty - pl.y);
-                if (ovX > 0 && ovY > 0) {
-                  penalty += (ovX * ovY) * 80 + 250;
-                }
-              }
-
-              // 稍微偏好偏離原始射線較小的候選點，保持視覺連貫
-              penalty += Math.abs(cand.p) * 0.4;
-
-              if (penalty < bestScore) {
-                bestScore = penalty;
-                bestX = tx;
-                bestY = ty;
-              }
-
-              if (penalty === 0) break;
+            // （2）嚴格位於關係線上；字較多的氣泡稍微靠近外側角色圓框（0.62~0.65，保持與圓框安全間距），其餘依奇偶錯落
+            var labelRatio;
+            if (isHeavyLabel) {
+              labelRatio = (index % 2 === 0) ? 0.63 : 0.60;
+            } else {
+              labelRatio = (index % 2 === 0) ? 0.37 : 0.50;
             }
 
-            var midX = bestX;
-            var midY = bestY;
-            placedLabelCoords.push({ x: midX, y: midY, hw: halfW, hh: halfH });
+            var midX = cx + (px - cx) * labelRatio;
+            var midY = cy + (py - cy) * labelRatio;
+
+            // （4）若靠近中央氣泡下方的「檔案」按鈕區域（約 cx=50, y 在 cy+6 ~ cy+19），調整比例避開
+            if (Math.abs(midX - cx) < 12.5 && midY > cy + 5 && midY < cy + 20) {
+              labelRatio = isHeavyLabel ? 0.66 : 0.63;
+              midX = cx + (px - cx) * labelRatio;
+              midY = cy + (py - cy) * labelRatio;
+            }
 
             var labelEl = document.createElement('div');
             labelEl.style.left = midX + '%';
@@ -1726,25 +1688,26 @@
             var arrowToPeer = getCompassArrow(visualDx, visualDy);
             var arrowToCenter = getCompassArrow(-visualDx, -visualDy);
 
+            // （3）完整顯示文字，不裁切
             if (item.bidirectional) {
               labelEl.className =
-                'absolute -translate-x-1/2 -translate-y-1/2 z-20 px-2 py-0.5 text-[9.5px] sm:text-xs tracking-[0.12em] text-gold bg-ink/95 border border-gold/70 rounded-full shadow-lg max-w-[130px] sm:max-w-[180px] truncate pointer-events-none';
+                'absolute -translate-x-1/2 -translate-y-1/2 z-20 px-2.5 py-0.5 text-[10px] sm:text-xs tracking-[0.12em] text-gold bg-ink/95 border border-gold/70 rounded-full shadow-lg whitespace-nowrap pointer-events-none';
               labelEl.textContent = '⇄ ' + item.label;
             } else if (item.label && item.reverseLabel) {
               labelEl.className =
-                'absolute -translate-x-1/2 -translate-y-1/2 z-20 px-2 py-0.5 text-[9px] sm:text-[10px] tracking-[0.06em] text-gold bg-ink/95 border border-gold/70 rounded-lg shadow-lg max-w-[140px] sm:max-w-[205px] text-center pointer-events-none flex flex-col items-center gap-0.5 leading-tight';
+                'absolute -translate-x-1/2 -translate-y-1/2 z-20 px-2.5 py-1 text-[9.5px] sm:text-[10.5px] tracking-[0.06em] text-gold bg-ink/95 border border-gold/70 rounded-lg shadow-lg whitespace-nowrap text-center pointer-events-none flex flex-col items-center gap-0.5 leading-tight';
               labelEl.innerHTML =
-                '<span class="truncate max-w-full">' + centerChar.shortName + ' ' + arrowToPeer + ' ' + item.character.shortName + '：' + item.label + '</span>' +
-                '<span class="text-[#C8B9A6] truncate max-w-full">' + item.character.shortName + ' ' + arrowToCenter + ' ' + centerChar.shortName + '：' + item.reverseLabel + '</span>';
+                '<span>' + centerChar.shortName + ' ' + arrowToPeer + ' ' + item.character.shortName + '：' + item.label + '</span>' +
+                '<span class="text-[#C8B9A6]">' + item.character.shortName + ' ' + arrowToCenter + ' ' + centerChar.shortName + '：' + item.reverseLabel + '</span>';
             } else if (item.label) {
               labelEl.className =
-                'absolute -translate-x-1/2 -translate-y-1/2 z-20 px-2 py-0.5 text-[9.5px] sm:text-xs tracking-[0.1em] text-gold bg-ink/95 border border-gold/70 rounded-full shadow-lg max-w-[140px] sm:max-w-[210px] truncate pointer-events-none';
+                'absolute -translate-x-1/2 -translate-y-1/2 z-20 px-2.5 py-0.5 text-[10px] sm:text-xs tracking-[0.1em] text-gold bg-ink/95 border border-gold/70 rounded-full shadow-lg whitespace-nowrap pointer-events-none';
               labelEl.textContent = (visualDx < -0.15)
                 ? (item.character.shortName + ' ' + arrowToPeer + ' ' + centerChar.shortName + '：' + item.label)
                 : (centerChar.shortName + ' ' + arrowToPeer + ' ' + item.character.shortName + '：' + item.label);
             } else {
               labelEl.className =
-                'absolute -translate-x-1/2 -translate-y-1/2 z-20 px-2 py-0.5 text-[9.5px] sm:text-xs tracking-[0.1em] text-[#C8B9A6] bg-ink/95 border border-gold/60 rounded-full shadow-lg max-w-[140px] sm:max-w-[210px] truncate pointer-events-none';
+                'absolute -translate-x-1/2 -translate-y-1/2 z-20 px-2.5 py-0.5 text-[10px] sm:text-xs tracking-[0.1em] text-[#C8B9A6] bg-ink/95 border border-gold/60 rounded-full shadow-lg whitespace-nowrap pointer-events-none';
               labelEl.textContent = (visualDx < -0.15)
                 ? (item.character.shortName + ' ' + arrowToCenter + ' ' + centerChar.shortName + '：' + item.reverseLabel)
                 : (centerChar.shortName + ' ' + arrowToCenter + ' ' + item.character.shortName + '：' + item.reverseLabel);
