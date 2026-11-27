@@ -532,8 +532,9 @@
         <span class="absolute bottom-2 left-2 w-3 h-3 border-b border-l border-gold/55 pointer-events-none"></span>
         <span class="absolute bottom-2 right-2 w-3 h-3 border-b border-r border-gold/55 pointer-events-none"></span>
 
+        <!-- 第一排：圖片畫廊橫向單排 -->
         <div class="flex items-center justify-between mb-4">
-          <span class="text-[10px] sm:text-xs tracking-[0.28em] text-gold/80">── 収蔵一覧 ──</span>
+          <span class="text-[10px] sm:text-xs tracking-[0.28em] text-gold/80">── 画像収蔵（一排） ──</span>
           <div class="flex items-center gap-2">
             <button
               id="gallery-prev-btn"
@@ -554,13 +555,21 @@
           </div>
         </div>
 
-        <!-- 橫向單排滑動容器 -->
         <div
           id="gallery-track"
           role="list"
-          aria-label="画廊橫向滑動列表"
-          class="flex flex-nowrap gap-4 sm:gap-5 overflow-x-auto snap-x snap-mandatory pb-3 scroll-smooth"
+          aria-label="画廊圖片橫向滑動列表"
+          class="flex flex-nowrap gap-4 sm:gap-5 overflow-x-auto snap-x snap-mandatory pb-4 scroll-smooth"
         ></div>
+
+        <!-- 第二排：關聯文章獨立區塊（置於圖片下方） -->
+        <div id="gallery-articles-block" class="mt-7 pt-6 border-t border-gold/25">
+          <div class="flex items-center justify-between mb-4">
+            <span class="text-[10px] sm:text-xs tracking-[0.28em] text-gold/85">── 関連文章一覧 ──</span>
+            <span class="text-[10px] tracking-[0.18em] text-[#8E877D]">ARTICLES</span>
+          </div>
+          <div id="gallery-articles-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+        </div>
       </div>
     </section>
 
@@ -685,11 +694,50 @@
       </div>
 
       <div class="p-5 sm:p-7 md:p-8 flex flex-col gap-6">
-        <!-- 放大圖片顯示區 -->
-        <div
-          id="gallery-modal-image-box"
-          class="w-full min-h-[240px] sm:min-h-[340px] max-h-[54dvh] rounded bg-ink/90 border border-gold/30 flex flex-col items-center justify-center p-3 overflow-hidden relative"
-        ></div>
+        <!-- 放大圖片顯示區（含上一張／下一張直接切換） -->
+        <div class="relative w-full min-h-[240px] sm:min-h-[340px] max-h-[54dvh] rounded bg-ink/90 border border-gold/30 flex items-center justify-center p-3 overflow-hidden select-none">
+          <button
+            id="modal-prev-img-btn"
+            type="button"
+            aria-label="上一張圖片"
+            class="hidden sm:flex absolute left-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-ink/85 hover:bg-gold text-gold hover:text-ink border border-gold/60 items-center justify-center text-lg shadow-lg transition-all cursor-pointer"
+          >
+            ‹
+          </button>
+
+          <div
+            id="gallery-modal-image-box"
+            class="w-full h-full flex flex-col items-center justify-center overflow-hidden"
+          ></div>
+
+          <button
+            id="modal-next-img-btn"
+            type="button"
+            aria-label="下一張圖片"
+            class="hidden sm:flex absolute right-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-ink/85 hover:bg-gold text-gold hover:text-ink border border-gold/60 items-center justify-center text-lg shadow-lg transition-all cursor-pointer"
+          >
+            ›
+          </button>
+
+          <!-- 手機版底部快速前後切換列 -->
+          <div id="modal-mobile-nav" class="flex sm:hidden items-center justify-between gap-3 w-full absolute inset-x-3 bottom-3 z-20 pointer-events-none">
+            <button
+              id="modal-mobile-prev-btn"
+              type="button"
+              class="pointer-events-auto px-3 py-1 rounded-full bg-ink/90 text-gold border border-gold/55 text-xs tracking-[0.14em] cursor-pointer"
+            >
+              ‹ 上一張
+            </button>
+            <span id="modal-img-counter" class="px-2.5 py-0.5 rounded-full bg-ink/85 text-[#C8B9A6] border border-gold/25 text-[10px] tracking-[0.16em]"></span>
+            <button
+              id="modal-mobile-next-btn"
+              type="button"
+              class="pointer-events-auto px-3 py-1 rounded-full bg-ink/90 text-gold border border-gold/55 text-xs tracking-[0.14em] cursor-pointer"
+            >
+              下一張 ›
+            </button>
+          </div>
+        </div>
 
         <!-- 內置說明區（標題、文字說明、外接連結） -->
         <div class="border-t border-gold/25 pt-5 flex flex-col gap-4">
@@ -1181,7 +1229,13 @@
         { source: 'zenmon', target: 'lin', label: '合作關係', bidirectional: true },
         { source: 'rui', target: 'satsuki', label: '工作夥伴', bidirectional: true },
         { source: 'rui', target: 'miki', label: '工作夥伴', bidirectional: true },
-        { source: 'junpei', target: 'nagi', label: '高中同學', bidirectional: true }
+        { source: 'junpei', target: 'nagi', label: '高中同學', bidirectional: true },
+        { source: 'gen', target: 'nagi', label: '我要成為姊姊的左右手', bidirectional: false },
+        { source: 'nagi', target: 'gen', label: '隨你去吧', bidirectional: false },
+        { source: 'gen', target: 'kana', label: '漂亮的姊姊', bidirectional: false },
+        { source: 'gen', target: 'kazuki', label: '目標', bidirectional: false },
+        { source: 'kana', target: 'gen', label: '聰明的孩子', bidirectional: false },
+        { source: 'gen', target: 'kuon', label: '姐姐討厭我也討厭', bidirectional: false }
       ];
 
       var activeCenterId = 'nagi';
@@ -1463,8 +1517,8 @@
             angleRad = -Math.PI / 2 + (index * 2 * Math.PI) / totalPeers;
           }
 
-          var radiusX = totalPeers <= 2 ? 0 : (totalPeers >= 5 ? 36 : 33);
-          var radiusY = totalPeers === 1 ? 37 : (totalPeers >= 5 ? 36 : 35);
+          var radiusX = totalPeers <= 2 ? 0 : (totalPeers >= 5 ? 37 : 35);
+          var radiusY = totalPeers === 1 ? 37 : (totalPeers >= 5 ? 36 : 35.5);
 
           var px = cx + radiusX * Math.cos(angleRad);
           var py = cy + radiusY * Math.sin(angleRad);
@@ -1538,8 +1592,9 @@
 
           var hasAnyLabel = item.bidirectional ? Boolean(item.label) : Boolean(item.label || item.reverseLabel);
           if (hasAnyLabel) {
+            var isHorizontal = Math.abs(Math.cos(angleRad)) > 0.85;
             var isBottomSide = Math.sin(angleRad) > 0.25;
-            var labelRatio = isBottomSide ? 0.62 : 0.54;
+            var labelRatio = isHorizontal ? 0.56 : (isBottomSide ? 0.62 : 0.54);
             var midX = cx + (px - cx) * labelRatio;
             var midY = cy + (py - cy) * labelRatio;
             var labelEl = document.createElement('div');
@@ -1557,17 +1612,17 @@
               labelEl.textContent = '⇄ ' + item.label;
             } else if (item.label && item.reverseLabel) {
               labelEl.className =
-                'absolute -translate-x-1/2 -translate-y-1/2 z-30 px-3 py-1 text-[10px] sm:text-[11px] tracking-[0.12em] text-gold bg-ink/95 border border-gold/70 rounded-xl shadow-lg whitespace-nowrap pointer-events-none flex flex-col items-center gap-0.5 leading-tight';
+                'absolute -translate-x-1/2 -translate-y-1/2 z-30 px-2.5 py-1 text-[9px] sm:text-[10px] tracking-[0.08em] text-gold bg-ink/95 border border-gold/70 rounded-xl shadow-lg max-w-[168px] sm:max-w-[205px] text-center pointer-events-none flex flex-col items-center gap-0.5 leading-snug';
               labelEl.innerHTML =
-                '<span>' + centerChar.shortName + ' ' + arrowToPeer + ' ' + item.character.shortName + '：' + item.label + '</span>' +
-                '<span class="text-[#C8B9A6] text-[9px] sm:text-[10px]">' + item.character.shortName + ' ' + arrowToCenter + ' ' + centerChar.shortName + '：' + item.reverseLabel + '</span>';
+                '<span class="break-words">' + centerChar.shortName + ' ' + arrowToPeer + ' ' + item.character.shortName + '：' + item.label + '</span>' +
+                '<span class="text-[#C8B9A6] break-words">' + item.character.shortName + ' ' + arrowToCenter + ' ' + centerChar.shortName + '：' + item.reverseLabel + '</span>';
             } else if (item.label) {
               labelEl.className =
-                'absolute -translate-x-1/2 -translate-y-1/2 z-30 px-2.5 py-0.5 text-[10px] sm:text-xs tracking-[0.14em] text-gold bg-ink/95 border border-gold/70 rounded-full shadow-lg whitespace-nowrap pointer-events-none';
+                'absolute -translate-x-1/2 -translate-y-1/2 z-30 px-2.5 py-0.5 text-[10px] sm:text-xs tracking-[0.12em] text-gold bg-ink/95 border border-gold/70 rounded-full shadow-lg max-w-[168px] sm:max-w-[210px] truncate pointer-events-none';
               labelEl.textContent = centerChar.shortName + ' ' + arrowToPeer + ' ' + item.character.shortName + '：' + item.label;
             } else {
               labelEl.className =
-                'absolute -translate-x-1/2 -translate-y-1/2 z-30 px-2.5 py-0.5 text-[10px] sm:text-xs tracking-[0.14em] text-[#C8B9A6] bg-ink/95 border border-gold/60 rounded-full shadow-lg whitespace-nowrap pointer-events-none';
+                'absolute -translate-x-1/2 -translate-y-1/2 z-30 px-2.5 py-0.5 text-[10px] sm:text-xs tracking-[0.12em] text-[#C8B9A6] bg-ink/95 border border-gold/60 rounded-full shadow-lg max-w-[168px] sm:max-w-[210px] truncate pointer-events-none';
               labelEl.textContent = item.character.shortName + ' ' + arrowToCenter + ' ' + centerChar.shortName + '：' + item.reverseLabel;
             }
 
@@ -1685,7 +1740,7 @@
         }
       });
 
-      var galleryItems = [
+      var imageGalleryItems = [
         {
           id: 'gallery-01',
           tag: '挿絵・関連文章',
@@ -1726,52 +1781,61 @@
           imageUrl: './11173.png',
           description: '最終戰03 視覺記録。',
           links: []
+        }
+      ];
+
+      var relatedArticlesList = [
+        {
+          title: '還是找點別的樂子比較好',
+          note: '文｜然然；圖｜秋柴',
+          url: 'https://telegra.ph/%E9%82%84%E6%98%AF%E6%89%BE%E9%BB%9E%E5%88%A5%E7%9A%84%E6%A8%82%E5%AD%90%E6%AF%94%E8%BC%83%E5%A5%BD-03-31'
         },
         {
-          id: 'gallery-article-archive',
-          tag: '関連文章集',
-          title: '関連文章一覧',
-          subtitle: '純文字關聯篇章合併收錄',
-          imageUrl: 'https://images.pexels.com/photos/7867803/pexels-photo-7867803.jpeg?auto=compress&cs=tinysrgb&w=1400',
-          imageClass: 'w-full h-full object-cover brightness-[0.42] contrast-[1.15] saturate-[0.65]',
-          isArticleCollection: true,
-          description: '合併收錄目前無獨立配圖之關聯文章與日常番外篇，點擊下方各篇連結即可前往閱讀。',
-          links: [
-            {
-              label: '數學作業',
-              url: 'https://telegra.ph/%E6%95%B8%E5%AD%B8%E4%BD%9C%E6%A5%AD-11-24'
-            },
-            {
-              label: '意外救援',
-              url: 'https://telegra.ph/%E6%84%8F%E5%A4%96%E6%95%91%E6%8F%B4-11-21'
-            },
-            {
-              label: '定位器',
-              url: 'https://telegra.ph/%E5%AE%9A%E4%BD%8D%E5%99%A8-11-20'
-            },
-            {
-              label: '《憶往昔》（文｜嶙光）',
-              url: 'https://paste.plurk.com/show/5pOuHfx2n66jUpiFxVS5/?from_app=1'
-            },
-            {
-              label: '《餵食》（文｜嶙光）',
-              url: 'https://paste.plurk.com/show/CZZKB9S3bzXFGU6Wc2S2/?from_app=1'
-            }
-          ]
+          title: '數學作業',
+          note: '關聯篇章',
+          url: 'https://telegra.ph/%E6%95%B8%E5%AD%B8%E4%BD%9C%E6%A5%AD-11-24'
+        },
+        {
+          title: '意外救援',
+          note: '關聯篇章',
+          url: 'https://telegra.ph/%E6%84%8F%E5%A4%96%E6%95%91%E6%8F%B4-11-21'
+        },
+        {
+          title: '定位器',
+          note: '關聯篇章',
+          url: 'https://telegra.ph/%E5%AE%9A%E4%BD%8D%E5%99%A8-11-20'
+        },
+        {
+          title: '《憶往昔》（文｜嶙光）',
+          note: '文｜嶙光',
+          url: 'https://paste.plurk.com/show/5pOuHfx2n66jUpiFxVS5/?from_app=1'
+        },
+        {
+          title: '《餵食》（文｜嶙光）',
+          note: '文｜嶙光',
+          url: 'https://paste.plurk.com/show/CZZKB9S3bzXFGU6Wc2S2/?from_app=1'
         }
       ];
 
       var galleryTrack = document.getElementById('gallery-track');
+      var galleryArticlesListEl = document.getElementById('gallery-articles-list');
       var galleryPrevBtn = document.getElementById('gallery-prev-btn');
       var galleryNextBtn = document.getElementById('gallery-next-btn');
       var galleryOverlay = document.getElementById('gallery-overlay');
       var galleryPanel = document.getElementById('gallery-panel');
       var closeGalleryBtn = document.getElementById('close-gallery-btn');
+      var modalPrevImgBtn = document.getElementById('modal-prev-img-btn');
+      var modalNextImgBtn = document.getElementById('modal-next-img-btn');
+      var modalMobilePrevBtn = document.getElementById('modal-mobile-prev-btn');
+      var modalMobileNextBtn = document.getElementById('modal-mobile-next-btn');
+      var modalImgCounter = document.getElementById('modal-img-counter');
       var galleryModalImageBox = document.getElementById('gallery-modal-image-box');
       var galleryModalTitle = document.getElementById('gallery-modal-title');
       var galleryModalTag = document.getElementById('gallery-modal-tag');
       var galleryModalDesc = document.getElementById('gallery-modal-desc');
       var galleryModalLinks = document.getElementById('gallery-modal-links');
+
+      var activeGalleryIndex = 0;
 
       function renderGalleryImageFallback(container, labelText) {
         container.innerHTML = '';
@@ -1780,20 +1844,21 @@
         var txt = document.createElement('p');
         txt.className = 'text-xs tracking-[0.22em] text-gold/80';
         txt.textContent = labelText || '画像未登録';
-        var sub = document.createElement('p');
-        sub.className = 'text-[10px] tracking-[0.14em] text-[#7E776D] mt-1';
-        sub.textContent = '（點擊可檢視說明與關聯文章連結）';
         container.appendChild(diamond);
         container.appendChild(txt);
-        container.appendChild(sub);
       }
 
-      function openGalleryModal(item) {
-        if (!item || !galleryOverlay || !galleryPanel) return;
+      function populateGalleryModalContent(index) {
+        if (!imageGalleryItems.length) return;
+        activeGalleryIndex = (index + imageGalleryItems.length) % imageGalleryItems.length;
+        var item = imageGalleryItems[activeGalleryIndex];
 
         if (galleryModalTitle) galleryModalTitle.textContent = item.title || '';
         if (galleryModalTag) galleryModalTag.textContent = item.tag || '画廊';
         if (galleryModalDesc) galleryModalDesc.textContent = item.description || '';
+        if (modalImgCounter) {
+          modalImgCounter.textContent = (activeGalleryIndex + 1) + ' / ' + imageGalleryItems.length;
+        }
 
         if (galleryModalImageBox) {
           galleryModalImageBox.innerHTML = '';
@@ -1827,6 +1892,11 @@
             });
           }
         }
+      }
+
+      function openGalleryModalByIndex(index) {
+        if (!imageGalleryItems.length || !galleryOverlay || !galleryPanel) return;
+        populateGalleryModalContent(index);
 
         galleryOverlay.classList.remove('hidden');
         document.body.style.overflow = 'hidden';
@@ -1837,6 +1907,11 @@
           galleryPanel.classList.remove('translate-y-4', 'opacity-0');
           galleryPanel.classList.add('translate-y-0', 'opacity-100');
         });
+      }
+
+      function stepGalleryModal(delta) {
+        if (!imageGalleryItems.length) return;
+        populateGalleryModalContent(activeGalleryIndex + delta);
       }
 
       function closeGalleryModal() {
@@ -1855,6 +1930,30 @@
       if (closeGalleryBtn) {
         closeGalleryBtn.addEventListener('click', closeGalleryModal);
       }
+      if (modalPrevImgBtn) {
+        modalPrevImgBtn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          stepGalleryModal(-1);
+        });
+      }
+      if (modalNextImgBtn) {
+        modalNextImgBtn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          stepGalleryModal(1);
+        });
+      }
+      if (modalMobilePrevBtn) {
+        modalMobilePrevBtn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          stepGalleryModal(-1);
+        });
+      }
+      if (modalMobileNextBtn) {
+        modalMobileNextBtn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          stepGalleryModal(1);
+        });
+      }
 
       if (galleryOverlay) {
         galleryOverlay.addEventListener('click', function (e) {
@@ -1865,8 +1964,14 @@
       }
 
       document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape' && galleryOverlay && !galleryOverlay.classList.contains('hidden')) {
-          closeGalleryModal();
+        if (galleryOverlay && !galleryOverlay.classList.contains('hidden')) {
+          if (e.key === 'Escape') {
+            closeGalleryModal();
+          } else if (e.key === 'ArrowLeft') {
+            stepGalleryModal(-1);
+          } else if (e.key === 'ArrowRight') {
+            stepGalleryModal(1);
+          }
         }
       });
 
@@ -1886,7 +1991,7 @@
         if (!galleryTrack) return;
         galleryTrack.innerHTML = '';
 
-        galleryItems.forEach(function (item) {
+        imageGalleryItems.forEach(function (item, idx) {
           var card = document.createElement('button');
           card.type = 'button';
           card.setAttribute('role', 'listitem');
@@ -1942,16 +2047,55 @@
           card.appendChild(metaBox);
 
           card.addEventListener('click', function () {
-            openGalleryModal(item);
+            openGalleryModalByIndex(idx);
           });
 
           galleryTrack.appendChild(card);
         });
       }
 
+      function renderRelatedArticles() {
+        if (!galleryArticlesListEl) return;
+        galleryArticlesListEl.innerHTML = '';
+
+        relatedArticlesList.forEach(function (art) {
+          var a = document.createElement('a');
+          a.href = art.url;
+          a.target = '_blank';
+          a.rel = 'noopener noreferrer';
+          a.className =
+            'flex items-center justify-between gap-2 px-4 py-3 rounded bg-ink/85 border border-gold/30 hover:border-gold hover:bg-gold/10 transition-all duration-200 group';
+
+          var leftBox = document.createElement('div');
+          leftBox.className = 'min-w-0';
+
+          var titleSpan = document.createElement('div');
+          titleSpan.className = 'text-xs sm:text-sm font-medium tracking-[0.12em] text-[#F0ECE3] group-hover:text-gold transition-colors truncate';
+          titleSpan.textContent = art.title;
+
+          leftBox.appendChild(titleSpan);
+
+          if (art.note) {
+            var noteSpan = document.createElement('div');
+            noteSpan.className = 'text-[10px] tracking-[0.1em] text-[#9A9287] mt-0.5 truncate';
+            noteSpan.textContent = art.note;
+            leftBox.appendChild(noteSpan);
+          }
+
+          var arrowSpan = document.createElement('span');
+          arrowSpan.className = 'text-xs text-gold/80 group-hover:text-gold shrink-0';
+          arrowSpan.textContent = '↗';
+
+          a.appendChild(leftBox);
+          a.appendChild(arrowSpan);
+          galleryArticlesListEl.appendChild(a);
+        });
+      }
+
       renderRelationStage();
       renderAvatarLinks();
       renderGalleryTrack();
+      renderRelatedArticles();
     });
   </script>
 </body>
