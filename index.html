@@ -461,7 +461,7 @@
 
         <div
           id="relation-stage"
-          class="relative w-full h-[450px] sm:h-[510px] rounded bg-ink/80 border border-gold/15 overflow-hidden mb-7 select-none"
+          class="relative w-full h-[520px] sm:h-[560px] rounded bg-ink/80 border border-gold/15 overflow-hidden mb-7 select-none"
         >
           <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
             <div class="w-48 h-48 sm:w-64 sm:h-64 rounded-full border border-gold/10"></div>
@@ -1031,20 +1031,22 @@
         linesSvg.innerHTML = '';
         nodesLayer.innerHTML = '';
 
-        var cx = 50;
-        var cy = connectedPeers.length > 0 ? 63 : 46;
         var totalPeers = connectedPeers.length;
+        var cx = 50;
+        var cy = totalPeers === 1 ? 58 : 47;
 
         connectedPeers.forEach(function (item, index) {
           var angleRad;
           if (totalPeers === 1) {
             angleRad = -Math.PI / 2;
+          } else if (totalPeers === 2) {
+            angleRad = index === 0 ? -Math.PI / 2 : Math.PI / 2;
           } else {
             angleRad = -Math.PI / 2 + (index * 2 * Math.PI) / totalPeers;
           }
 
-          var radiusX = totalPeers === 1 ? 0 : 28;
-          var radiusY = totalPeers === 1 ? 37 : 31;
+          var radiusX = totalPeers <= 2 ? 0 : 32;
+          var radiusY = totalPeers === 1 ? 37 : 35;
 
           var px = cx + radiusX * Math.cos(angleRad);
           var py = cy + radiusY * Math.sin(angleRad);
@@ -1060,13 +1062,15 @@
           linesSvg.appendChild(line);
 
           if (item.label) {
-            var midX = (cx + px) / 2;
-            var midY = (cy + py) / 2;
+            var isBottomSide = Math.sin(angleRad) > 0.25;
+            var labelRatio = isBottomSide ? 0.62 : 0.54;
+            var midX = cx + (px - cx) * labelRatio;
+            var midY = cy + (py - cy) * labelRatio;
             var labelEl = document.createElement('div');
             labelEl.style.left = midX + '%';
             labelEl.style.top = midY + '%';
             labelEl.className =
-              'absolute -translate-x-1/2 -translate-y-1/2 z-30 px-3 py-0.5 text-[11px] sm:text-xs tracking-[0.22em] text-gold bg-ink border border-gold/70 rounded-full shadow-lg whitespace-nowrap pointer-events-none';
+              'absolute -translate-x-1/2 -translate-y-1/2 z-30 px-2.5 py-0.5 text-[10px] sm:text-xs tracking-[0.18em] text-gold bg-ink/95 border border-gold/70 rounded-full shadow-lg whitespace-nowrap pointer-events-none';
             labelEl.textContent = item.bidirectional ? '⇄ ' + item.label : item.label;
             nodesLayer.appendChild(labelEl);
           }
@@ -1077,7 +1081,7 @@
           peerBtn.style.top = py + '%';
           peerBtn.setAttribute('aria-label', '切換焦點至 ' + item.character.name);
           peerBtn.className =
-            'bubble-node absolute -translate-x-1/2 -translate-y-1/2 z-20 w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden bg-ink-light/95 border border-gold/60 hover:border-gold flex flex-col items-center justify-center p-1.5 text-center shadow-lg cursor-pointer group';
+            'bubble-node absolute -translate-x-1/2 -translate-y-1/2 z-20 w-[72px] h-[72px] sm:w-24 sm:h-24 rounded-full overflow-hidden bg-ink-light/95 border border-gold/60 hover:border-gold flex flex-col items-center justify-center p-1 text-center shadow-lg cursor-pointer group';
 
           populateBubbleContent(peerBtn, item.character, false);
           peerBtn.addEventListener('click', function () {
@@ -1095,7 +1099,7 @@
 
         var centerNode = document.createElement('div');
         centerNode.className =
-          'bubble-center w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden bg-ink border-2 border-gold flex flex-col items-center justify-center p-1 text-center relative';
+          'bubble-center w-[88px] h-[88px] sm:w-28 sm:h-28 rounded-full overflow-hidden bg-ink border-2 border-gold flex flex-col items-center justify-center p-1 text-center relative';
 
         populateBubbleContent(centerNode, centerChar, true);
         centerWrapper.appendChild(centerNode);
