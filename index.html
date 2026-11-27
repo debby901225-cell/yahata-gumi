@@ -1636,52 +1636,86 @@
 
           var hasAnyLabel = item.bidirectional ? Boolean(item.label) : Boolean(item.label || item.reverseLabel);
           if (hasAnyLabel) {
-            // 採用內／中／外三段錯落比例，讓相鄰關係氣泡前後錯開不堆疊
-            var staggerRatios = totalPeers >= 7 ? [0.38, 0.58, 0.46, 0.64] : [0.44, 0.56];
-            var labelRatio = staggerRatios[index % staggerRatios.length];
-            var midX = cx + (px - cx) * labelRatio;
-            var midY = cy + (py - cy) * labelRatio;
+            var isTwoLine = !item.bidirectional && Boolean(item.label && item.reverseLabel);
+            var halfW = isTwoLine ? 13.5 : (item.bidirectional ? 7.8 : 11.2);
+            var halfH = isTwoLine ? 4.4 : 2.8;
 
-            // 若與中央氣泡、周圍頭像氣泡或已放置的標籤過近，嘗試錯落候選位置
-            var candidateRatios = [labelRatio, 0.36, 0.52, 0.62, 0.42, 0.68];
-            for (var cIdx = 0; cIdx < candidateRatios.length; cIdx++) {
-              var testR = candidateRatios[cIdx];
-              var tx = cx + (px - cx) * testR;
-              var ty = cy + (py - cy) * testR;
+            var staggerRatios = totalPeers >= 7 ? [0.37, 0.61, 0.48, 0.68] : [0.43, 0.57];
+            var baseR = staggerRatios[index % staggerRatios.length];
+            var perpSign = (index % 2 === 0) ? 1 : -1;
 
-              // 避開中央氣泡（含下方「檔案」按鈕區域）
-              if (Math.hypot(tx - cx, ty - (cy + 2)) < 12.5) continue;
+            var candidates = [
+              { r: baseR, p: 0 },
+              { r: baseR, p: perpSign * 4.5 },
+              { r: baseR, p: -perpSign * 4.5 },
+              { r: 0.36, p: 0 },
+              { r: 0.62, p: 0 },
+              { r: 0.50, p: perpSign * 5.5 },
+              { r: 0.50, p: -perpSign * 5.5 },
+              { r: 0.68, p: perpSign * 3.5 },
+              { r: 0.68, p: -perpSign * 3.5 }
+            ];
+
+            var bestX = cx + (px - cx) * baseR;
+            var bestY = cy + (py - cy) * baseR;
+            var bestScore = Infinity;
+
+            for (var cIdx = 0; cIdx < candidates.length; cIdx++) {
+              var cand = candidates[cIdx];
+              var tx = cx + (px - cx) * cand.r + perpX * cand.p;
+              var ty = cy + (py - cy) * cand.r + perpY * cand.p;
+
+              // 保持在畫布安全邊界內
+              if (tx < 8 || tx > 92 || ty < 8 || ty > 92) continue;
+
+              var penalty = 0;
+
+              // 避開中央焦點氣泡與下方「檔案」按鈕
+              var dCenterX = Math.max(0, Math.abs(tx - cx) - (10.5 + halfW));
+              var dCenterY = Math.max(0, Math.abs(ty - (cy + 1.5)) - (12.0 + halfH));
+              if (dCenterX === 0 && dCenterY === 0) {
+                penalty += 500;
+              } else {
+                penalty += Math.max(0, 6 - Math.hypot(dCenterX, dCenterY)) * 8;
+              }
 
               // 避開所有周圍頭像氣泡
-              var hitsPeer = false;
               for (var pIdx = 0; pIdx < peerCoords.length; pIdx++) {
                 var pc = peerCoords[pIdx];
-                if (Math.hypot(tx - pc.px, ty - pc.py) < 11.5) {
-                  hitsPeer = true;
-                  break;
+                var overlapPx = (8.8 + halfW) - Math.abs(tx - pc.px);
+                var overlapPy = (8.8 + halfH) - Math.abs(ty - pc.py);
+                if (overlapPx > 0 && overlapPy > 0) {
+                  penalty += (overlapPx * overlapPy) * 40 + 300;
                 }
               }
-              if (hitsPeer) continue;
 
-              // 避開已放置的關係文字氣泡（考慮橫向寬度）
-              var hitsLabel = false;
+              // 避開已放置的關係文字氣泡（矩形交集面積懲罰）
               for (var lIdx = 0; lIdx < placedLabelCoords.length; lIdx++) {
                 var pl = placedLabelCoords[lIdx];
-                var dxNorm = (tx - pl.x) * 0.72;
-                var dyNorm = (ty - pl.y) * 1.35;
-                if (Math.hypot(dxNorm, dyNorm) < 9.5) {
-                  hitsLabel = true;
-                  break;
+                var padX = 1.6;
+                var padY = 1.2;
+                var ovX = (halfW + pl.hw + padX) - Math.abs(tx - pl.x);
+                var ovY = (halfH + pl.hh + padY) - Math.abs(ty - pl.y);
+                if (ovX > 0 && ovY > 0) {
+                  penalty += (ovX * ovY) * 80 + 250;
                 }
               }
-              if (hitsLabel) continue;
 
-              midX = tx;
-              midY = ty;
-              break;
+              // 稍微偏好偏離原始射線較小的候選點，保持視覺連貫
+              penalty += Math.abs(cand.p) * 0.4;
+
+              if (penalty < bestScore) {
+                bestScore = penalty;
+                bestX = tx;
+                bestY = ty;
+              }
+
+              if (penalty === 0) break;
             }
 
-            placedLabelCoords.push({ x: midX, y: midY });
+            var midX = bestX;
+            var midY = bestY;
+            placedLabelCoords.push({ x: midX, y: midY, hw: halfW, hh: halfH });
 
             var labelEl = document.createElement('div');
             labelEl.style.left = midX + '%';
