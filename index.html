@@ -341,10 +341,11 @@
           <span class="text-sm sm:text-base font-medium tracking-[0.25em]">八幡組</span>
         </button>
 
-        <nav aria-label="章節導覽" class="flex items-center gap-3 sm:gap-7 text-xs sm:text-sm tracking-[0.18em] text-[#C8C0B4]">
+        <nav aria-label="章節導覽" class="flex items-center gap-2.5 sm:gap-6 text-[11px] sm:text-sm tracking-[0.14em] sm:tracking-[0.18em] text-[#C8C0B4]">
           <a href="#section-creed" class="hover:text-gold transition-colors py-1">綱領</a>
           <a href="#section-history" class="hover:text-gold transition-colors py-1">沿革</a>
           <a href="#section-relations" class="hover:text-gold transition-colors py-1">人物關關係圖</a>
+          <a href="#section-vote" class="hover:text-gold transition-colors py-1">少當家投票</a>
           <a href="#section-gallery" class="hover:text-gold transition-colors py-1">画廊</a>
         </nav>
 
@@ -531,6 +532,158 @@
     </section>
 
     <!-- =========================================================================
+         林的少當家賭盤區 (#section-vote)：位於人物關係圖下方、画廊上方
+         ========================================================================= -->
+    <section id="section-vote" class="scroll-mt-20 max-w-4xl mx-auto px-4 sm:px-6 mt-16 sm:mt-24">
+      <div class="text-center mb-8 sm:mb-10">
+        <p class="text-[10px] sm:text-xs tracking-[0.4em] text-gold/75 uppercase mb-1.5">UNDERGROUND WAGER</p>
+        <h2 class="text-xl sm:text-2xl font-semibold tracking-[0.3em] pl-[0.3em] text-gold">林的少當家賭盤</h2>
+        <p class="text-xs sm:text-sm tracking-[0.16em] text-[#F0ECE3] mt-2.5">
+          來唷～來唷～一次十萬，下好離手、下好離手～
+        </p>
+      </div>
+
+      <div class="border border-gold/35 rounded bg-ink-card/80 p-5 sm:p-8 relative shadow-[0_14px_38px_rgba(0,0,0,0.5)]">
+        <span class="absolute top-2 left-2 w-3 h-3 border-t border-l border-gold/65 pointer-events-none"></span>
+        <span class="absolute top-2 right-2 w-3 h-3 border-t border-r border-gold/65 pointer-events-none"></span>
+        <span class="absolute bottom-2 left-2 w-3 h-3 border-b border-l border-gold/65 pointer-events-none"></span>
+        <span class="absolute bottom-2 right-2 w-3 h-3 border-b border-r border-gold/65 pointer-events-none"></span>
+
+        <div class="flex items-center justify-center gap-2 mb-6 pb-3 border-b border-gold/20">
+          <span class="w-2 h-2 rotate-45 bg-gold/80"></span>
+          <span class="text-[10px] sm:text-xs tracking-[0.26em] text-gold/90">── 八幡組後繼者賭局・單注 ¥100,000 ──</span>
+        </div>
+
+        <!-- 兩位少當家候補賭盤卡片 -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-7">
+          <!-- 候補一：八幡 凪 -->
+          <div
+            id="vote-card-nagi"
+            class="rounded bg-ink/90 border border-gold/35 p-4 sm:p-5 flex flex-col justify-between gap-4 transition-all duration-300"
+          >
+            <div class="flex items-center gap-3.5">
+              <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden border-2 border-gold/75 bg-ink shrink-0 flex items-center justify-center">
+                <img src="./eighthead01.png" alt="八幡 凪" class="w-full h-full object-contain p-0.5" onerror="this.style.display='none'" />
+              </div>
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-1.5 mb-1">
+                  <span class="inline-block px-2 py-0.5 text-[10px] tracking-[0.16em] text-gold bg-gold/10 border border-gold/35 rounded-sm">
+                    少當家候補
+                  </span>
+                  <span id="vote-odds-nagi" class="text-[10px] tracking-[0.12em] text-[#C8B9A6] bg-ink border border-gold/25 px-2 py-0.5 rounded-sm">
+                    賠率 2.00x
+                  </span>
+                </div>
+                <h3 class="text-base sm:text-lg font-semibold tracking-[0.2em] text-[#F5F1E8]">八幡 凪</h3>
+                <p class="text-[11px] tracking-[0.1em] text-[#9A9287] mt-0.5">本家血脈・為奪回主導權入局</p>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex items-baseline justify-between mb-1.5">
+                <span id="vote-pct-nagi" class="text-xl sm:text-2xl font-semibold tracking-[0.12em] text-gold">0%</span>
+                <span class="text-[10px] tracking-[0.16em] text-[#8E877D]">支持佔比</span>
+              </div>
+              <div class="w-full h-2.5 rounded-full bg-[#070A0C] border border-gold/25 overflow-hidden">
+                <div
+                  id="vote-bar-nagi"
+                  style="width: 0%;"
+                  class="h-full bg-gradient-to-r from-gold-dark via-gold to-gold-light transition-all duration-500"
+                ></div>
+              </div>
+            </div>
+
+            <button
+              id="vote-btn-nagi"
+              type="button"
+              data-vote-candidate="nagi"
+              class="w-full py-2.5 px-4 rounded bg-gold/15 hover:bg-gold text-gold hover:text-ink border border-gold/70 font-medium text-xs sm:text-sm tracking-[0.18em] transition-all duration-200 cursor-pointer active:scale-[0.98] flex items-center justify-center gap-2"
+            >
+              <span>押注 八幡 凪</span>
+              <span class="px-2 py-0.5 rounded bg-ink/70 text-gold-light text-[10px] tracking-[0.12em]">+¥100,000</span>
+            </button>
+          </div>
+
+          <!-- 候補二：嶽釜 久遠 -->
+          <div
+            id="vote-card-kuon"
+            class="rounded bg-ink/90 border border-gold/35 p-4 sm:p-5 flex flex-col justify-between gap-4 transition-all duration-300"
+          >
+            <div class="flex items-center gap-3.5">
+              <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden border-2 border-gold/75 bg-ink shrink-0 flex items-center justify-center">
+                <img src="./kuo01.png" alt="嶽釜 久遠" class="w-full h-full object-contain p-0.5" onerror="this.style.display='none'" />
+              </div>
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-1.5 mb-1">
+                  <span class="inline-block px-2 py-0.5 text-[10px] tracking-[0.16em] text-gold bg-gold/10 border border-gold/35 rounded-sm">
+                    少當家候補
+                  </span>
+                  <span id="vote-odds-kuon" class="text-[10px] tracking-[0.12em] text-[#C8B9A6] bg-ink border border-gold/25 px-2 py-0.5 rounded-sm">
+                    賠率 2.00x
+                  </span>
+                </div>
+                <h3 class="text-base sm:text-lg font-semibold tracking-[0.2em] text-[#F5F1E8]">嶽釜 久遠</h3>
+                <p class="text-[11px] tracking-[0.1em] text-[#9A9287] mt-0.5">冷冽狠辣・視繼承戰為場遊戲</p>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex items-baseline justify-between mb-1.5">
+                <span id="vote-pct-kuon" class="text-xl sm:text-2xl font-semibold tracking-[0.12em] text-[#D8CBB8]">0%</span>
+                <span class="text-[10px] tracking-[0.16em] text-[#8E877D]">支持佔比</span>
+              </div>
+              <div class="w-full h-2.5 rounded-full bg-[#070A0C] border border-gold/25 overflow-hidden">
+                <div
+                  id="vote-bar-kuon"
+                  style="width: 0%;"
+                  class="h-full bg-gradient-to-r from-[#6E655A] via-[#A89B89] to-[#D8CBB8] transition-all duration-500"
+                ></div>
+              </div>
+            </div>
+
+            <button
+              id="vote-btn-kuon"
+              type="button"
+              data-vote-candidate="kuon"
+              class="w-full py-2.5 px-4 rounded bg-gold/15 hover:bg-gold text-gold hover:text-ink border border-gold/70 font-medium text-xs sm:text-sm tracking-[0.18em] transition-all duration-200 cursor-pointer active:scale-[0.98] flex items-center justify-center gap-2"
+            >
+              <span>押注 嶽釜 久遠</span>
+              <span class="px-2 py-0.5 rounded bg-ink/70 text-gold-light text-[10px] tracking-[0.12em]">+¥100,000</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 賭盤籌碼分佈條與下注明細提示 -->
+        <div class="rounded bg-ink/85 border border-gold/25 px-4 py-3.5 flex flex-col gap-2.5">
+          <div class="flex items-center justify-between text-[11px] sm:text-xs tracking-[0.14em]">
+            <span id="vote-split-left" class="text-gold font-medium">八幡 凪 50%</span>
+            <span class="text-[#8E877D] text-[10px] tracking-[0.22em]">籌碼比重</span>
+            <span id="vote-split-right" class="text-[#D8CBB8] font-medium">50% 嶽釜 久遠</span>
+          </div>
+
+          <div class="w-full h-3 rounded-full bg-[#070A0C] border border-gold/30 overflow-hidden flex">
+            <div
+              id="vote-split-bar-nagi"
+              style="width: 50%;"
+              class="h-full bg-gradient-to-r from-gold-dark to-gold transition-all duration-500"
+            ></div>
+            <div
+              id="vote-split-bar-kuon"
+              style="width: 50%;"
+              class="h-full bg-gradient-to-l from-[#8E8271] to-[#C8B9A6] transition-all duration-500"
+            ></div>
+          </div>
+
+          <div class="pt-1 text-center sm:text-left">
+            <p id="vote-status-msg" class="text-[11px] tracking-[0.12em] text-[#9A9287]">
+              每人限押一注（¥100,000），下好離手
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================================
          画廊・記録區 (#section-gallery)：位於人物氣泡下方，橫向單排滑動式陳列
          ========================================================================= -->
     <section id="section-gallery" class="scroll-mt-20 max-w-4xl mx-auto px-4 sm:px-6 mt-16 sm:mt-24">
@@ -550,7 +703,7 @@
 
         <!-- 第一排：圖片畫廊橫向單排 -->
         <div class="flex items-center justify-between mb-4">
-          <span class="text-[10px] sm:text-xs tracking-[0.28em] text-gold/80">── 画像収蔵 ──</span>
+          <span class="text-[10px] sm:text-xs tracking-[0.28em] text-gold/80">── 画像収蔵（一排） ──</span>
           <div class="flex items-center gap-2">
             <button
               id="gallery-prev-btn"
@@ -2191,6 +2344,224 @@
           }
         });
       }
+
+      // =====================================================================
+      // 林的少當家賭盤模組邏輯（Firebase Realtime Database 多人即時累計 + 單次下注鎖定）
+      // =====================================================================
+      var FIREBASE_DB_URL = 'https://yahata-gumi-wager-default-rtdb.asia-southeast1.firebasedatabase.app';
+      var LOCAL_USER_WAGER_KEY = 'yahata_gumi_lin_wager_choice_v3';
+
+      var voteState = {
+        nagi: 0,
+        kuon: 0,
+        userChoice: null,
+        isSubmitting: false
+      };
+
+      try {
+        var localChoice = localStorage.getItem(LOCAL_USER_WAGER_KEY);
+        if (localChoice === 'nagi' || localChoice === 'kuon') {
+          voteState.userChoice = localChoice;
+        }
+      } catch (e) {}
+
+      function saveLocalUserChoice(choice) {
+        try {
+          if (choice) {
+            localStorage.setItem(LOCAL_USER_WAGER_KEY, choice);
+          }
+        } catch (e) {}
+      }
+
+      function computeImpliedOdds(targetCount, totalCount) {
+        if (totalCount <= 0 || targetCount <= 0) return '2.00x';
+        var raw = totalCount / targetCount;
+        var clamped = Math.min(9.99, Math.max(1.05, raw));
+        return clamped.toFixed(2) + 'x';
+      }
+
+      function lockWagerButtons() {
+        var allBtns = document.querySelectorAll('[data-vote-candidate]');
+        allBtns.forEach(function (btn) {
+          btn.disabled = true;
+          btn.className =
+            'w-full py-2.5 px-4 rounded bg-[#182026] text-[#7A756E] border border-[#2C353C] font-medium text-xs sm:text-sm tracking-[0.22em] cursor-not-allowed opacity-75 flex items-center justify-center';
+          btn.textContent = '已下注';
+        });
+      }
+
+      function renderVoteBoard() {
+        var total = voteState.nagi + voteState.kuon;
+        var pctNagi = total > 0 ? Math.round((voteState.nagi / total) * 1000) / 10 : 0;
+        var pctKuon = total > 0 ? Math.round((100 - pctNagi) * 10) / 10 : 0;
+
+        var splitNagi = total > 0 ? pctNagi : 50;
+        var splitKuon = total > 0 ? pctKuon : 50;
+
+        var pctNagiEl = document.getElementById('vote-pct-nagi');
+        var oddsNagiEl = document.getElementById('vote-odds-nagi');
+        var barNagiEl = document.getElementById('vote-bar-nagi');
+        var cardNagiEl = document.getElementById('vote-card-nagi');
+
+        var pctKuonEl = document.getElementById('vote-pct-kuon');
+        var oddsKuonEl = document.getElementById('vote-odds-kuon');
+        var barKuonEl = document.getElementById('vote-bar-kuon');
+        var cardKuonEl = document.getElementById('vote-card-kuon');
+
+        var splitLeftEl = document.getElementById('vote-split-left');
+        var splitRightEl = document.getElementById('vote-split-right');
+        var splitBarNagiEl = document.getElementById('vote-split-bar-nagi');
+        var splitBarKuonEl = document.getElementById('vote-split-bar-kuon');
+        var statusMsgEl = document.getElementById('vote-status-msg');
+
+        if (pctNagiEl) pctNagiEl.textContent = pctNagi.toFixed(total > 0 ? 1 : 0) + '%';
+        if (oddsNagiEl) oddsNagiEl.textContent = '賠率 ' + computeImpliedOdds(voteState.nagi, total);
+        if (barNagiEl) barNagiEl.style.width = pctNagi + '%';
+
+        if (pctKuonEl) pctKuonEl.textContent = pctKuon.toFixed(total > 0 ? 1 : 0) + '%';
+        if (oddsKuonEl) oddsKuonEl.textContent = '賠率 ' + computeImpliedOdds(voteState.kuon, total);
+        if (barKuonEl) barKuonEl.style.width = pctKuon + '%';
+
+        if (splitLeftEl) splitLeftEl.textContent = '八幡 凪 ' + splitNagi.toFixed(total > 0 ? 1 : 0) + '%';
+        if (splitRightEl) splitRightEl.textContent = splitKuon.toFixed(total > 0 ? 1 : 0) + '% 嶽釜 久遠';
+        if (splitBarNagiEl) splitBarNagiEl.style.width = splitNagi + '%';
+        if (splitBarKuonEl) splitBarKuonEl.style.width = splitKuon + '%';
+
+        if (cardNagiEl && cardKuonEl) {
+          if (voteState.nagi > voteState.kuon) {
+            cardNagiEl.classList.add('border-gold', 'shadow-[0_0_24px_rgba(150,114,73,0.22)]');
+            cardKuonEl.classList.remove('border-gold', 'shadow-[0_0_24px_rgba(150,114,73,0.22)]');
+          } else if (voteState.kuon > voteState.nagi) {
+            cardKuonEl.classList.add('border-gold', 'shadow-[0_0_24px_rgba(150,114,73,0.22)]');
+            cardNagiEl.classList.remove('border-gold', 'shadow-[0_0_24px_rgba(150,114,73,0.22)]');
+          } else {
+            cardNagiEl.classList.remove('border-gold', 'shadow-[0_0_24px_rgba(150,114,73,0.22)]');
+            cardKuonEl.classList.remove('border-gold', 'shadow-[0_0_24px_rgba(150,114,73,0.22)]');
+          }
+        }
+
+        if (voteState.userChoice) {
+          lockWagerButtons();
+          if (statusMsgEl) {
+            var chosenName = voteState.userChoice === 'nagi' ? '八幡 凪' : '嶽釜 久遠';
+            statusMsgEl.textContent = '已押注「' + chosenName + '」（¥100,000），下好離手！';
+            statusMsgEl.classList.remove('text-[#9A9287]');
+            statusMsgEl.classList.add('text-gold');
+          }
+        }
+      }
+
+      var hasRemoteSyncSuccess = false;
+      var localPendingOffset = { nagi: 0, kuon: 0 };
+
+      function applyBetsDataMap(betsObj) {
+        var nagiSum = 0;
+        var kuonSum = 0;
+        if (betsObj && typeof betsObj === 'object') {
+          Object.keys(betsObj).forEach(function (key) {
+            var rec = betsObj[key];
+            if (!rec || typeof rec !== 'object') return;
+            if (rec.candidate === 'nagi') nagiSum += 1;
+            else if (rec.candidate === 'kuon') kuonSum += 1;
+          });
+        }
+        hasRemoteSyncSuccess = true;
+        localPendingOffset = { nagi: 0, kuon: 0 };
+        voteState.nagi = nagiSum;
+        voteState.kuon = kuonSum;
+        renderVoteBoard();
+      }
+
+      function fetchLatestBetsOnce() {
+        return fetch(FIREBASE_DB_URL + '/lin_wager/bets.json', { cache: 'no-store' })
+          .then(function (res) {
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            return res.json();
+          })
+          .then(function (data) {
+            applyBetsDataMap(data);
+          })
+          .catch(function () {
+            renderVoteBoard();
+          });
+      }
+
+      function initRealtimeWagerStream() {
+        renderVoteBoard();
+        fetchLatestBetsOnce();
+
+        if (typeof window.EventSource !== 'undefined') {
+          try {
+            var es = new EventSource(FIREBASE_DB_URL + '/lin_wager/bets.json');
+            es.addEventListener('put', function (ev) {
+              try {
+                var parsed = JSON.parse(ev.data);
+                if (parsed && parsed.path === '/') {
+                  applyBetsDataMap(parsed.data);
+                } else {
+                  fetchLatestBetsOnce();
+                }
+              } catch (err) {
+                fetchLatestBetsOnce();
+              }
+            });
+            es.addEventListener('patch', function () {
+              fetchLatestBetsOnce();
+            });
+            es.onerror = function () {
+              // 連線波動時改由定時同步兜底
+            };
+          } catch (e) {}
+        }
+
+        setInterval(fetchLatestBetsOnce, 5000);
+      }
+
+      var voteButtons = document.querySelectorAll('[data-vote-candidate]');
+      voteButtons.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          if (voteState.userChoice || voteState.isSubmitting) return;
+          var cand = btn.getAttribute('data-vote-candidate');
+          if (cand !== 'nagi' && cand !== 'kuon') return;
+
+          voteState.isSubmitting = true;
+          voteState.userChoice = cand;
+          localPendingOffset[cand] += 1;
+          voteState[cand] += 1;
+          saveLocalUserChoice(cand);
+          lockWagerButtons();
+          renderVoteBoard();
+
+          fetch(FIREBASE_DB_URL + '/lin_wager/bets.json', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              candidate: cand,
+              amount: 100000,
+              createdAt: Date.now()
+            })
+          })
+            .then(function (res) {
+              if (!res.ok) throw new Error('HTTP ' + res.status);
+              voteState.isSubmitting = false;
+              return fetchLatestBetsOnce();
+            })
+            .catch(function (err) {
+              voteState.isSubmitting = false;
+              renderVoteBoard();
+              var statusMsgEl = document.getElementById('vote-status-msg');
+              if (statusMsgEl) {
+                var chosenName = cand === 'nagi' ? '八幡 凪' : '嶽釜 久遠';
+                statusMsgEl.textContent =
+                  '已押注「' + chosenName + '」（¥100,000）—— 尚未連通雲端資料庫（請確認 Firebase Rules 已發布 .read/.write: true）';
+                statusMsgEl.classList.remove('text-[#9A9287]');
+                statusMsgEl.classList.add('text-gold');
+              }
+            });
+        });
+      });
+
+      initRealtimeWagerStream();
 
       renderRelationStage();
       renderAvatarLinks();
