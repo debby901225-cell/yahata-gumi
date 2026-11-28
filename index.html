@@ -344,7 +344,7 @@
         <nav aria-label="章節導覽" class="flex items-center gap-2.5 sm:gap-6 text-[11px] sm:text-sm tracking-[0.14em] sm:tracking-[0.18em] text-[#C8C0B4]">
           <a href="#section-creed" class="hover:text-gold transition-colors py-1">綱領</a>
           <a href="#section-history" class="hover:text-gold transition-colors py-1">沿革</a>
-          <a href="#section-relations" class="hover:text-gold transition-colors py-1">人物關關係圖</a>
+          <a href="#section-relations" class="hover:text-gold transition-colors py-1">人物關係圖</a>
           <a href="#section-vote" class="hover:text-gold transition-colors py-1">少當家投票</a>
           <a href="#section-gallery" class="hover:text-gold transition-colors py-1">画廊</a>
         </nav>
@@ -460,7 +460,7 @@
     <section id="section-relations" class="scroll-mt-20 max-w-4xl mx-auto px-4 sm:px-6">
       <div class="text-center mb-8 sm:mb-10">
         <p class="text-[10px] sm:text-xs tracking-[0.4em] text-gold/75 uppercase mb-1.5">RELATIONSHIP MAP</p>
-        <h2 class="text-xl sm:text-2xl font-semibold tracking-[0.3em] pl-[0.3em] text-gold">人物關關係圖</h2>
+        <h2 class="text-xl sm:text-2xl font-semibold tracking-[0.3em] pl-[0.3em] text-gold">人物關係圖</h2>
         <p class="text-[11px] sm:text-xs tracking-[0.16em] text-[#9A9287] mt-2">
           點擊氣泡切換焦點人物；點選中央焦點氣泡下方的「檔案」開啟個人檔案頁
         </p>
@@ -2346,10 +2346,11 @@
       }
 
       // =====================================================================
-      // 林的少當家賭盤模組邏輯（Firebase Realtime Database 多人即時累計 + 單次下注鎖定）
+      // 林的少當家賭盤模組邏輯（精簡計數器 + 條件式原子遞增 + 分頁可見才同步）
       // =====================================================================
       var FIREBASE_DB_URL = 'https://yahata-gumi-wager-default-rtdb.asia-southeast1.firebasedatabase.app';
-      var LOCAL_USER_WAGER_KEY = 'yahata_gumi_lin_wager_choice_v3';
+      var COUNTS_ENDPOINT = FIREBASE_DB_URL + '/lin_wager/counts.json';
+      var LOCAL_USER_WAGER_KEY = 'yahata_gumi_lin_wager_choice_v4';
 
       var voteState = {
         nagi: 0,
@@ -2357,6 +2358,9 @@
         userChoice: null,
         isSubmitting: false
       };
+
+      var activeEventSource = null;
+      var fallbackPollTimer = null;
 
       try {
         var localChoice = localStorage.getItem(LOCAL_USER_WAGER_KEY);
@@ -2451,71 +2455,129 @@
         }
       }
 
-      var hasRemoteSyncSuccess = false;
-      var localPendingOffset = { nagi: 0, kuon: 0 };
-
-      function applyBetsDataMap(betsObj) {
-        var nagiSum = 0;
-        var kuonSum = 0;
-        if (betsObj && typeof betsObj === 'object') {
-          Object.keys(betsObj).forEach(function (key) {
-            var rec = betsObj[key];
-            if (!rec || typeof rec !== 'object') return;
-            if (rec.candidate === 'nagi') nagiSum += 1;
-            else if (rec.candidate === 'kuon') kuonSum += 1;
-          });
+      function applyCountsPayload(countsObj) {
+        if (!countsObj || typeof countsObj !== 'object') {
+          voteState.nagi = 0;
+          voteState.kuon = 0;
+        } else {
+          var nextNagi = Number(countsObj.nagi);
+          var nextKuon = Number(countsObj.kuon);
+          voteState.nagi = (!isNaN(nextNagi) && nextNagi >= 0) ? Math.floor(nextNagi) : 0;
+          voteState.kuon = (!isNaN(nextKuon) && nextKuon >= 0) ? Math.floor(nextKuon) : 0;
         }
-        hasRemoteSyncSuccess = true;
-        localPendingOffset = { nagi: 0, kuon: 0 };
-        voteState.nagi = nagiSum;
-        voteState.kuon = kuonSum;
         renderVoteBoard();
       }
 
-      function fetchLatestBetsOnce() {
-        return fetch(FIREBASE_DB_URL + '/lin_wager/bets.json', { cache: 'no-store' })
+      function fetchLatestCountsOnce() {
+        return fetch(COUNTS_ENDPOINT, { cache: 'no-store' })
           .then(function (res) {
             if (!res.ok) throw new Error('HTTP ' + res.status);
             return res.json();
           })
           .then(function (data) {
-            applyBetsDataMap(data);
+            applyCountsPayload(data);
           })
           .catch(function () {
             renderVoteBoard();
           });
       }
 
-      function initRealtimeWagerStream() {
-        renderVoteBoard();
-        fetchLatestBetsOnce();
+      function incrementCountAtomically(candidate, attempt) {
+        var retryCount = attempt || 0;
+        return fetch(COUNTS_ENDPOINT, {
+          cache: 'no-store',
+          headers: { 'X-Firebase-ETag': 'true' }
+        })
+          .then(function (res) {
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            var etag = res.headers.get('ETag');
+            return res.json().then(function (current) {
+              var baseNagi = (current && typeof current.nagi === 'number') ? Math.max(0, Math.floor(current.nagi)) : 0;
+              var baseKuon = (current && typeof current.kuon === 'number') ? Math.max(0, Math.floor(current.kuon)) : 0;
+              var updated = {
+                nagi: baseNagi + (candidate === 'nagi' ? 1 : 0),
+                kuon: baseKuon + (candidate === 'kuon' ? 1 : 0)
+              };
+
+              var putHeaders = { 'Content-Type': 'application/json' };
+              if (etag) {
+                putHeaders['if-match'] = etag;
+              }
+
+              return fetch(COUNTS_ENDPOINT, {
+                method: 'PUT',
+                headers: putHeaders,
+                body: JSON.stringify(updated)
+              }).then(function (putRes) {
+                if (putRes.status === 412 && retryCount < 3) {
+                  return incrementCountAtomically(candidate, retryCount + 1);
+                }
+                if (!putRes.ok) throw new Error('PUT HTTP ' + putRes.status);
+                return putRes.json();
+              });
+            });
+          })
+          .then(function (savedData) {
+            applyCountsPayload(savedData);
+          });
+      }
+
+      function stopRealtimeSync() {
+        if (activeEventSource) {
+          try {
+            activeEventSource.close();
+          } catch (e) {}
+          activeEventSource = null;
+        }
+        if (fallbackPollTimer) {
+          clearInterval(fallbackPollTimer);
+          fallbackPollTimer = null;
+        }
+      }
+
+      function startRealtimeSync() {
+        stopRealtimeSync();
+        if (document.visibilityState === 'hidden') return;
+
+        fetchLatestCountsOnce();
 
         if (typeof window.EventSource !== 'undefined') {
           try {
-            var es = new EventSource(FIREBASE_DB_URL + '/lin_wager/bets.json');
+            var es = new EventSource(COUNTS_ENDPOINT);
+            activeEventSource = es;
             es.addEventListener('put', function (ev) {
               try {
                 var parsed = JSON.parse(ev.data);
                 if (parsed && parsed.path === '/') {
-                  applyBetsDataMap(parsed.data);
+                  applyCountsPayload(parsed.data);
                 } else {
-                  fetchLatestBetsOnce();
+                  fetchLatestCountsOnce();
                 }
               } catch (err) {
-                fetchLatestBetsOnce();
+                fetchLatestCountsOnce();
               }
             });
             es.addEventListener('patch', function () {
-              fetchLatestBetsOnce();
+              fetchLatestCountsOnce();
             });
-            es.onerror = function () {
-              // 連線波動時改由定時同步兜底
-            };
           } catch (e) {}
         }
 
-        setInterval(fetchLatestBetsOnce, 5000);
+        // 低頻兜底輪詢（每 30 秒一次，僅在分頁可見時運作，精簡免費額度用量）
+        fallbackPollTimer = setInterval(function () {
+          if (document.visibilityState === 'visible') {
+            fetchLatestCountsOnce();
+          }
+        }, 30000);
       }
+
+      document.addEventListener('visibilitychange', function () {
+        if (document.visibilityState === 'hidden') {
+          stopRealtimeSync();
+        } else {
+          startRealtimeSync();
+        }
+      });
 
       var voteButtons = document.querySelectorAll('[data-vote-candidate]');
       voteButtons.forEach(function (btn) {
@@ -2526,34 +2588,23 @@
 
           voteState.isSubmitting = true;
           voteState.userChoice = cand;
-          localPendingOffset[cand] += 1;
           voteState[cand] += 1;
           saveLocalUserChoice(cand);
           lockWagerButtons();
           renderVoteBoard();
 
-          fetch(FIREBASE_DB_URL + '/lin_wager/bets.json', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              candidate: cand,
-              amount: 100000,
-              createdAt: Date.now()
-            })
-          })
-            .then(function (res) {
-              if (!res.ok) throw new Error('HTTP ' + res.status);
+          incrementCountAtomically(cand, 0)
+            .then(function () {
               voteState.isSubmitting = false;
-              return fetchLatestBetsOnce();
             })
-            .catch(function (err) {
+            .catch(function () {
               voteState.isSubmitting = false;
               renderVoteBoard();
               var statusMsgEl = document.getElementById('vote-status-msg');
               if (statusMsgEl) {
                 var chosenName = cand === 'nagi' ? '八幡 凪' : '嶽釜 久遠';
                 statusMsgEl.textContent =
-                  '已押注「' + chosenName + '」（¥100,000）—— 尚未連通雲端資料庫（請確認 Firebase Rules 已發布 .read/.write: true）';
+                  '已押注「' + chosenName + '」（¥100,000）—— 尚未連通雲端資料庫（請確認 Firebase Rules 已發布 /lin_wager/counts 讀寫權限）';
                 statusMsgEl.classList.remove('text-[#9A9287]');
                 statusMsgEl.classList.add('text-gold');
               }
@@ -2561,7 +2612,8 @@
         });
       });
 
-      initRealtimeWagerStream();
+      renderVoteBoard();
+      startRealtimeSync();
 
       renderRelationStage();
       renderAvatarLinks();
